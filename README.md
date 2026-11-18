@@ -35,6 +35,22 @@ API-nycklar, bara GitHub Actions.
 Vivino tillåter inte automatiska anrop, så Vivinobetyg hämtas inte. Varje vin har i stället
 en länk som söker upp vinet på Vivino.
 
+## Varukorg per släpp
+
+Tryck på **+** vid ett vin för att lägga det i varukorgen för sitt släpp och välj antal flaskor.
+Listen längst ner visar korgen för släppet du tittar på. **Visa** öppnar varukorgen med summa,
+varningar för små upplagor och knapparna:
+
+- **Lägg till i kalendern**: skapar en kalenderhändelse på säljstarten med dina viner, och
+  påminnelser kvällen före kl 19 och 15 minuter före. Ändrar du korgen efteråt visas det, och du
+  lägger till den igen (ta bort den gamla händelsen).
+- **Kopiera lista**: artikelnummer, antal och pris, att klistra in var du vill.
+- **Öppna hos Systembolaget**: länkar till varje vin. Systembolaget kan inte ta emot en varukorg
+  utifrån, så själva beställningen gör du hos dem.
+
+**Mina varukorgar** visar alla släpp du planerat köp i, och **Bara min varukorg** döljer allt annat.
+Varukorgarna sparas i webbläsaren du använder och rensas 30 dagar efter släppet.
+
 ## Dina preferenser
 
 **På sidan:** tryck på *Mina preferenser* i filterraden. Där väljer du favoritdruvor (skriv eller

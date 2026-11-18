@@ -46,6 +46,7 @@ def normalisera(p: dict) -> dict:
         "namn": namn,
         "producent": p.get("producerName") or "",
         "lansering": (p.get("productLaunchDate") or "")[:10],
+        "saljstart_tid": (p.get("sellStartTime") or "10:00")[:5],
         "sortiment": p.get("assortmentText") or "",
         "webblansering": bool(p.get("isWebLaunch")),
         "pris": p.get("price"),

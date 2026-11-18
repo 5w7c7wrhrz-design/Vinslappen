@@ -77,7 +77,7 @@ section.slapp { margin-bottom: 40px; }
 .slapp-huvud { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; margin-bottom: 8px; }
 .slapp-huvud .meta { color: var(--dov); font-size: 0.88rem; }
 .slapp.passerat .slapp-huvud h2 { color: var(--dov); }
-.vin { scroll-margin-top: 120px; display: grid; grid-template-columns: 34px 56px 1fr; gap: 14px; padding: 14px 0; border-top: 1px solid var(--linje); }
+.vin { scroll-margin-top: 120px; display: grid; grid-template-columns: 34px 56px 1fr 40px; gap: 14px; padding: 14px 0; border-top: 1px solid var(--linje); }
 .vin > div { min-width: 0; }
 .betyg { display: grid; justify-items: center; align-content: start; gap: 4px; padding-top: 2px; }
 .betyg b { font: 700 1.6rem/1 var(--siffror); font-variant-numeric: tabular-nums; color: var(--fg); }
@@ -105,6 +105,66 @@ summary { cursor: pointer; color: var(--vin); font-size: 0.88rem; font-weight: 5
 .tomt { color: var(--dov); padding: 18px 0; }
 footer { color: var(--dov); font-size: 0.82rem; border-top: 1px solid var(--linje); padding-top: 16px; display: grid; gap: 6px; max-width: 70ch; }
 .dold { display: none !important; }
+/* varukorg */
+.valj { width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--linje); background: var(--yta); color: var(--dov);
+  display: grid; place-items: center; cursor: pointer; align-self: start; padding: 0; }
+.valj svg { width: 18px; height: 18px; }
+.valj:hover { border-color: var(--vin); color: var(--vin); }
+.valj[aria-pressed="true"] { background: var(--vin); border-color: var(--vin); color: var(--yta); }
+.vin.i-korg { background: linear-gradient(90deg, var(--vin-svag), transparent 80%); }
+.antal { display: flex; align-items: center; gap: 10px; margin-top: 8px; font-size: 0.85rem; color: var(--dov); flex-wrap: wrap; }
+.steg { display: inline-flex; align-items: center; border: 1px solid var(--linje); border-radius: 999px; background: var(--yta); }
+.steg button { width: 32px; height: 30px; border: 0; background: none; color: var(--fg); font: 700 1rem var(--text); cursor: pointer; border-radius: 999px; }
+.steg output { min-width: 22px; text-align: center; font: 700 0.9rem var(--siffror); color: var(--fg); }
+.antal .delsumma { font-family: var(--siffror); color: var(--fg); }
+.korgbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; pointer-events: none;
+  padding: 0 max(12px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px)); }
+.korgbar > div { pointer-events: auto; max-width: 836px; margin: 0 auto; background: var(--fg); color: var(--bg); border-radius: 16px;
+  padding: 10px 12px 10px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; box-shadow: 0 10px 28px rgba(20, 10, 25, 0.28); }
+.korgbar .l { font-size: 0.75rem; opacity: 0.75; }
+.korgbar .s { font-weight: 700; font-variant-numeric: tabular-nums; }
+.korgbar button { background: var(--bg); color: var(--fg); border: 0; border-radius: 10px; padding: 8px 14px; font: 700 0.9rem var(--text); cursor: pointer; flex: none; }
+body.har-korg .wrap { padding-bottom: 110px; }
+.ark-bakgrund { position: fixed; inset: 0; background: rgba(20, 10, 25, 0.45); z-index: 30; }
+.ark { position: fixed; left: 0; right: 0; bottom: 0; z-index: 31; max-height: calc(100% - 40px - env(safe-area-inset-top, 0px)); overflow-y: auto;
+  background: var(--yta); color: var(--fg); border-radius: 20px 20px 0 0; box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2);
+  padding: 10px max(16px, env(safe-area-inset-right, 0px)) calc(20px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.ark-inre { max-width: 640px; margin: 0 auto; display: grid; gap: 12px; }
+.ark-huvud { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.ark-huvud h2 { font-size: 1.35rem; }
+.stang { border: 1px solid var(--linje); background: var(--yta); color: var(--fg); border-radius: 999px; padding: 6px 12px; font: 600 0.85rem var(--text); cursor: pointer; flex: none; }
+.korgrad { display: grid; grid-template-columns: 26px 1fr auto; gap: 12px; align-items: center; padding: 10px 0; border-top: 1px solid var(--linje); }
+.korgrad > div { min-width: 0; }
+.korgrad .flaska { width: 26px; height: 80px; padding: 2px; border-radius: 6px; }
+.korgrad .n { font-weight: 600; line-height: 1.3; }
+.korgrad .m { color: var(--dov); font-size: 0.82rem; }
+.korgrad .sum { font: 700 0.95rem var(--siffror); text-align: right; white-space: nowrap; }
+.korgrad .steg { margin-top: 6px; }
+.korgsumma { display: flex; justify-content: space-between; align-items: baseline; border-top: 2px solid var(--fg); padding-top: 10px; }
+.korgsumma b { font: 700 1.4rem var(--siffror); }
+.varning { background: var(--gul-svag); color: var(--gul); border-radius: 10px; padding: 9px 12px; font-size: 0.88rem; }
+.korgknappar { display: grid; gap: 8px; }
+.korgknappar .tva { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.kn { border-radius: 10px; padding: 11px 12px; font: 700 0.92rem var(--text); border: 1px solid var(--linje); background: var(--yta); color: var(--fg); cursor: pointer; text-align: center; }
+.kn.prim { background: var(--vin); border-color: var(--vin); color: var(--yta); }
+.kn.lank { border: 0; color: var(--vin); font-weight: 600; padding: 6px; background: none; }
+.kn.fara { color: var(--yta); background: var(--vin); border-color: var(--vin); }
+.korgstatus { color: var(--grön); font-size: 0.88rem; font-weight: 500; min-height: 1.3em; }
+.sblankar { display: grid; gap: 6px; font-size: 0.9rem; }
+.korgkort { border: 1px solid var(--linje); border-radius: 14px; padding: 12px 14px; display: grid; gap: 8px; cursor: pointer; background: var(--yta); text-align: left; font: inherit; color: inherit; width: 100%; }
+.korgkort:hover { border-color: var(--vin); }
+.korgkort .h { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+.korgkort .h b { font-size: 1rem; }
+.korgkort .h span { font: 700 0.95rem var(--siffror); white-space: nowrap; }
+.korgkort .u { color: var(--dov); font-size: 0.82rem; }
+.korgkort .r { display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; }
+.miniflaskor { display: flex; gap: 5px; flex-wrap: wrap; }
+.miniflaskor .flaska { width: 18px; height: 56px; padding: 1px; border-radius: 4px; }
+.kalmarke { font-size: 0.78rem; font-weight: 600; border-radius: 999px; padding: 4px 10px; border: 1px solid var(--linje); color: var(--vin); white-space: nowrap; }
+.kalmarke.ok { background: var(--grön-svag); color: var(--grön); border-color: transparent; }
+.kalmarke.andrad { background: var(--gul-svag); color: var(--gul); border-color: transparent; }
+.chip .antal-bubbla { background: var(--vin); color: var(--yta); border-radius: 999px; padding: 0 7px; font-size: 0.75rem; font-weight: 700; }
+.chip[aria-pressed="true"] .antal-bubbla { background: var(--bg); color: var(--fg); }
 .betyg .kort { display: none; }
 .flaska { display: flex; align-items: flex-end; justify-content: center; width: 34px; height: 116px; border-radius: 8px;
   background: var(--flaska); padding: 4px 3px; overflow: hidden; align-self: start; }
@@ -134,7 +194,13 @@ footer { color: var(--dov); font-size: 0.82rem; border-top: 1px solid var(--linj
 .status { color: var(--grön); font-size: 0.88rem; font-weight: 500; }
 #instl-json { width: 100%; font: 0.8rem var(--siffror); background: var(--bg); color: var(--fg); border: 1px solid var(--linje); border-radius: 8px; padding: 8px; }
 @media (max-width: 520px) {
-  .vin { grid-template-columns: 28px 46px 1fr; gap: 10px; }
+  .vin { grid-template-columns: 28px 46px 1fr 36px; gap: 10px; }
+  .filter { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+    margin-left: calc(-1 * max(16px, env(safe-area-inset-left, 0px))); margin-right: calc(-1 * max(16px, env(safe-area-inset-right, 0px)));
+    padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .filter::-webkit-scrollbar { display: none; }
+  .filter > * { flex: none; white-space: nowrap; }
+  .valj { width: 34px; height: 34px; }
   .vin .flaska { width: 28px; height: 96px; }
   .betyg small { letter-spacing: 0.02em; }
   .betyg .lang { display: none; }
@@ -186,6 +252,8 @@ footer { color: var(--dov); font-size: 0.82rem; border-top: 1px solid var(--linj
   <button class="chip typ" type="button" id="f-typ-{{ t }}" data-typ="{{ t }}" aria-pressed="false"><span class="prick" style="background: var(--{{ t }})"></span>{{ {"rott":"Rött","vitt":"Vitt","rose":"Rosé","bubbel":"Mousserande","sott":"Sött & starkt","ovrigt":"Övrigt"}[t] }}</button>
   {% endfor %}
   <label for="f-max">Maxpris <input type="number" id="f-max" inputmode="numeric" min="0" step="50" placeholder="kr"></label>
+  <button class="chip" type="button" id="f-korg" aria-pressed="false">Bara min varukorg</button>
+  <button class="chip" type="button" id="korg-oversikt-knapp">Mina varukorgar <span class="antal-bubbla" id="korg-antal">0</span></button>
   <button class="chip instl" type="button" id="instl-knapp" aria-expanded="false" aria-controls="instl">Mina preferenser</button>
 </div>
 
@@ -244,7 +312,7 @@ footer { color: var(--dov); font-size: 0.82rem; border-top: 1px solid var(--linj
     <span class="meta">{{ s.typer|join(" & ") }} · {{ s.viner|length }} viner · {{ s.provade }} provade{% if s.passerat %} · redan släppt{% elif s.dagar_kvar == 0 %} · i dag{% else %} · om {{ s.dagar_kvar }} {{ "dag" if s.dagar_kvar == 1 else "dagar" }}{% endif %}</span>
   </div>
   {% for v in s.viner %}
-  <article class="vin" id="v-{{ v.nr }}" data-typ="{{ typklass(v) }}" data-pris="{{ v.pris or 0 }}" data-kop="{{ 1 if v.kopforslag else 0 }}" data-provat="{{ 1 if v.betyg_kalla == 'finewines' else 0 }}" data-betyg="{{ v.betyg }}" data-prisvarde="{{ v.prisvarde }}" data-rank="{{ v.rank }}" data-datum="{{ v.lansering }}" data-datumtext="{{ svenskt_datum(v.lansering) }}" data-namn="{{ v.namn }}" data-land="{{ v.land }}" data-prisvisning="{{ v.pris|kr }}" data-poang="{{ v.betyg|poang }}" data-druvor="{{ v.druvor|join('|')|lower }}" data-plats="{{ (v.land ~ ' ' ~ v.region)|lower }}" data-prod="{{ (v.producent ~ ' ' ~ v.namn)|lower }}" data-fasta="{{ v.etiketter|reject('equalto', 'Din stil')|join(', ') }}" data-bild="{{ v.bild or '' }}">
+  <article class="vin" id="v-{{ v.nr }}" data-typ="{{ typklass(v) }}" data-pris="{{ v.pris or 0 }}" data-kop="{{ 1 if v.kopforslag else 0 }}" data-provat="{{ 1 if v.betyg_kalla == 'finewines' else 0 }}" data-betyg="{{ v.betyg }}" data-prisvarde="{{ v.prisvarde }}" data-rank="{{ v.rank }}" data-datum="{{ v.lansering }}" data-datumtext="{{ svenskt_datum(v.lansering) }}" data-namn="{{ v.namn }}" data-land="{{ v.land }}" data-prisvisning="{{ v.pris|kr }}" data-poang="{{ v.betyg|poang }}" data-druvor="{{ v.druvor|join('|')|lower }}" data-plats="{{ (v.land ~ ' ' ~ v.region)|lower }}" data-prod="{{ (v.producent ~ ' ' ~ v.namn)|lower }}" data-fasta="{{ v.etiketter|reject('equalto', 'Din stil')|join(', ') }}" data-bild="{{ v.bild or '' }}" data-nr="{{ v.nr }}" data-url="{{ v.url }}" data-flaskor="{{ v.flaskor or '' }}" data-tid="{{ v.saljstart_tid or '10:00' }}" data-sortiment="{{ v.sortiment }}">
     {{ flaska(v, 100) }}
     <div class="betyg {{ 'provat' if v.betyg_kalla == 'finewines' else 'gissat' }}">
       <b>{{ v.betyg|poang }}</b>
@@ -284,7 +352,12 @@ footer { color: var(--dov); font-size: 0.82rem; border-top: 1px solid var(--linj
         <a href="https://www.vivino.com/search/wines?q={{ v.namn|quote }}" target="_blank" rel="noopener">Sök på Vivino</a>
         {% if v.trad %}<a href="{{ v.trad.url }}" target="_blank" rel="noopener">Forumtråden</a>{% endif %}
       </div>
+      <div class="antal dold">Antal
+        <span class="steg"><button type="button" data-steg="-1" aria-label="En flaska färre">−</button><output>1</output><button type="button" data-steg="1" aria-label="En flaska till">+</button></span>
+        <span class="delsumma"></span>
+      </div>
     </div>
+    <button type="button" class="valj" aria-pressed="false" aria-label="Lägg {{ v.namn }} i varukorgen"><svg viewBox="0 0 20 20" aria-hidden="true"><path class="plus" d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none"/><path class="bock" d="M4.5 10.5l3.5 3.5 7.5-8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none" style="display:none"/></svg></button>
   </article>
   {% endfor %}
   <p class="tomt dold">Inga viner matchar filtret för det här släppet.</p>
@@ -298,9 +371,51 @@ footer { color: var(--dov); font-size: 0.82rem; border-top: 1px solid var(--linj
   <span>Uppskattade betyg bygger på pris, område, ålder och hur mycket vinet diskuteras. De är en gissning och blir aldrig köpförslag på egen hand. Prisvärde visar hur många poäng över eller under det vanliga för prisklassen vinet ligger.</span>
 </footer>
 </div>
+
+<div class="korgbar dold" id="korgbar"><div>
+  <div><div class="l" id="korgbar-rubrik">Varukorg</div><div class="s" id="korgbar-summa"></div></div>
+  <button type="button" id="korgbar-visa">Visa</button>
+</div></div>
+
+<div class="ark-bakgrund dold" id="ark-bakgrund"></div>
+<section class="ark dold" id="ark-korg" role="dialog" aria-modal="true" aria-labelledby="ark-korg-rubrik">
+  <div class="ark-inre">
+    <div class="ark-huvud">
+      <div><span class="etikett" id="ark-korg-etikett"></span><h2 id="ark-korg-rubrik"></h2></div>
+      <button type="button" class="stang" data-stang>Stäng</button>
+    </div>
+    <div id="ark-korg-rader"></div>
+    <div class="korgsumma"><span id="ark-korg-flaskor"></span><b id="ark-korg-summa"></b></div>
+    <div id="ark-korg-varningar" class="sblankar"></div>
+    <div class="korgknappar">
+      <button type="button" class="kn prim" id="korg-kalender">Lägg till i kalendern</button>
+      <div class="tva">
+        <button type="button" class="kn" id="korg-kopiera">Kopiera lista</button>
+        <button type="button" class="kn" id="korg-sb" aria-expanded="false">Öppna hos Systembolaget</button>
+      </div>
+      <div class="sblankar dold" id="korg-sb-lankar"></div>
+      <textarea id="korg-text" class="dold" rows="7" readonly aria-label="Inköpslista" style="width:100%;font:0.8rem var(--siffror);background:var(--bg);color:var(--fg);border:1px solid var(--linje);border-radius:8px;padding:8px"></textarea>
+      <div class="korgstatus" id="korg-status" role="status"></div>
+      <button type="button" class="kn lank" id="korg-tom">Töm varukorgen</button>
+    </div>
+  </div>
+</section>
+<section class="ark dold" id="ark-oversikt" role="dialog" aria-modal="true" aria-labelledby="ark-oversikt-rubrik">
+  <div class="ark-inre">
+    <div class="ark-huvud">
+      <div><span class="etikett">Mina varukorgar</span><h2 id="ark-oversikt-rubrik">Planerade köp</h2></div>
+      <button type="button" class="stang" data-stang>Stäng</button>
+    </div>
+    <div id="oversikt-kort" style="display:grid;gap:10px"></div>
+    <div class="korgsumma" id="oversikt-summa-rad"><span id="oversikt-flaskor"></span><b id="oversikt-summa"></b></div>
+    <p class="tomt dold" id="oversikt-tom">Varukorgen är tom. Tryck på + vid ett vin för att lägga det i varukorgen för sitt släpp.</p>
+    <p style="margin:0;color:var(--dov);font-size:0.82rem">Varukorgarna sparas i den här webbläsaren. Beställningen gör du hos Systembolaget.</p>
+  </div>
+</section>
 <script>
 (function () {
-  var st = { kop: false, provat: false, typer: new Set(), max: 0, datum: "", sort: "rank" };
+  var st = { kop: false, provat: false, typer: new Set(), max: 0, datum: "", sort: "rank", korg: false };
+  var korg = {}, kalSparad = {};
   var datumFinns = {}; document.querySelectorAll("#f-datum option").forEach(function (o) { datumFinns[o.value] = 1; });
   var KEY = "vinslapp-filter";
   try { var s = JSON.parse(localStorage.getItem(KEY) || "{}"); st.kop = !!s.kop; st.provat = !!s.provat; st.typer = new Set(s.typer || []); st.max = +s.max || 0; st.sort = s.sort || "rank"; } catch (e) {}
@@ -423,6 +538,7 @@ footer { color: var(--dov); font-size: 0.82rem; border-top: 1px solid var(--linj
     document.getElementById("f-max").value = st.max || "";
     document.getElementById("f-datum").value = st.datum;
     document.getElementById("f-sort").value = st.sort;
+    document.getElementById("f-korg").setAttribute("aria-pressed", st.korg);
     var kopSynliga = 0;
     document.querySelectorAll(".kop li").forEach(function (li) {
       var ok = !st.datum || li.dataset.datum === st.datum; li.classList.toggle("dold", !ok); if (ok) kopSynliga++;
@@ -444,7 +560,8 @@ footer { color: var(--dov); font-size: 0.82rem; border-top: 1px solid var(--linj
       var synliga = 0;
       sec.querySelectorAll("article.vin").forEach(function (a) {
         var ok = (!st.kop || a.dataset.kop === "1") && (!st.provat || a.dataset.provat === "1")
-          && (!st.typer.size || st.typer.has(a.dataset.typ)) && (!st.max || +a.dataset.pris <= st.max);
+          && (!st.typer.size || st.typer.has(a.dataset.typ)) && (!st.max || +a.dataset.pris <= st.max)
+          && (!st.korg || !!korg[a.dataset.nr]);
         a.classList.toggle("dold", !ok); if (ok) synliga++;
       });
       var t = sec.querySelector(".tomt"); if (t) t.classList.toggle("dold", synliga > 0);
@@ -454,11 +571,11 @@ footer { color: var(--dov); font-size: 0.82rem; border-top: 1px solid var(--linj
   document.getElementById("f-provat").onclick = function () { st.provat = !st.provat; spara(); rita(); };
   document.querySelectorAll(".chip.typ").forEach(function (b) { b.onclick = function () { var t = b.dataset.typ; st.typer.has(t) ? st.typer.delete(t) : st.typer.add(t); spara(); rita(); }; });
   document.getElementById("f-datum").onchange = function (e) {
-    st.datum = e.target.value; rita();
+    st.datum = e.target.value; rita(); if (window.vinslappKorg) window.vinslappKorg();
     try { history.replaceState(null, "", st.datum ? "#d-" + st.datum : location.pathname + location.search); } catch (x) {}
     window.scrollTo({ top: 0 });
   };
-  window.addEventListener("hashchange", function () { var h = location.hash.replace("#d-", ""); if (datumFinns[h]) { st.datum = h; rita(); } });
+  window.addEventListener("hashchange", function () { var h = location.hash.replace("#d-", ""); if (datumFinns[h]) { st.datum = h; rita(); if (window.vinslappKorg) window.vinslappKorg(); } });
   document.getElementById("f-sort").onchange = function (e) { st.sort = e.target.value; spara(); rita(); };
   document.getElementById("f-max").oninput = function (e) { st.max = +e.target.value || 0; spara(); rita(); };
   document.addEventListener("click", function (ev) {
@@ -471,9 +588,302 @@ footer { color: var(--dov); font-size: 0.82rem; border-top: 1px solid var(--linj
       if (mal) { mal.scrollIntoView({ block: "start" }); var d = mal.querySelector("details"); if (d) d.open = true; }
     })();
   });
+  /* ================= Varukorg ================= */
+  var KORG = "vinslapp-varukorg", KAL = "vinslapp-varukorg-kalender";
+  try { korg = JSON.parse(localStorage.getItem(KORG) || "{}") || {}; } catch (e) { korg = {}; }
+  try { kalSparad = JSON.parse(localStorage.getItem(KAL) || "{}") || {}; } catch (e) { kalSparad = {}; }
+  var IDAG = "{{ idag }}";
+  var MANAD = ["januari","februari","mars","april","maj","juni","juli","augusti","september","oktober","november","december"];
+  var VECKODAG = ["söndag","måndag","tisdag","onsdag","torsdag","fredag","lördag"];
+  var artiklar = {};
+  document.querySelectorAll("article.vin").forEach(function (a) { artiklar[a.dataset.nr] = a; });
+
+  // rensa varukorgar för släpp som var för mer än 30 dagar sedan
+  (function () {
+    var grans = new Date(IDAG + "T12:00:00"); grans.setDate(grans.getDate() - 30);
+    var g = grans.toISOString().slice(0, 10);
+    Object.keys(korg).forEach(function (nr) { if (!korg[nr] || korg[nr].datum < g) delete korg[nr]; });
+  })();
+
+  function sparaKorg() {
+    try { localStorage.setItem(KORG, JSON.stringify(korg)); localStorage.setItem(KAL, JSON.stringify(kalSparad)); } catch (e) {}
+  }
+  function kr(v) { return Math.round(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u202f") + " kr"; }
+  function datumText(d) { var x = new Date(d + "T12:00:00"); return VECKODAG[x.getDay()] + " " + x.getDate() + " " + MANAD[x.getMonth()]; }
+  function stor(t) { return t.charAt(0).toUpperCase() + t.slice(1); }
+  function poster(datum) {
+    return Object.keys(korg).filter(function (nr) { return korg[nr].datum === datum; })
+      .map(function (nr) { return Object.assign({ nr: nr }, korg[nr]); })
+      .sort(function (a, b) { return b.pris * b.antal - a.pris * a.antal; });
+  }
+  function slappDatum() {
+    var s = {}; Object.keys(korg).forEach(function (nr) { s[korg[nr].datum] = 1; });
+    return Object.keys(s).sort();
+  }
+  function summa(lista) { return lista.reduce(function (t, p) { return t + p.pris * p.antal; }, 0); }
+  function flaskor(lista) { return lista.reduce(function (t, p) { return t + p.antal; }, 0); }
+  function flaskText(n) { return n + (n === 1 ? " flaska" : " flaskor"); }
+  function signatur(datum) { return poster(datum).map(function (p) { return p.nr + "x" + p.antal; }).join(","); }
+
+  function flaskElement(bild, typ) {
+    var el = document.createElement("span");
+    el.className = "flaska" + (bild ? "" : " tom");
+    el.style.setProperty("--typ", "var(--" + (typ || "ovrigt") + ")");
+    if (bild) {
+      var im = document.createElement("img"); im.src = bild + "_100.webp"; im.alt = ""; im.loading = "lazy";
+      im.onerror = function () { el.classList.add("tom"); im.remove(); };
+      el.appendChild(im);
+    }
+    return el;
+  }
+
+  function sattAntal(nr, antal) {
+    var a = artiklar[nr];
+    if (antal <= 0) { delete korg[nr]; }
+    else if (korg[nr]) { korg[nr].antal = Math.min(antal, 99); }
+    else if (a) {
+      var d = a.dataset;
+      korg[nr] = { antal: Math.min(antal, 99), datum: d.datum, namn: d.namn, pris: +d.pris, bild: d.bild, url: d.url,
+                   typ: d.typ, flaskor: +d.flaskor || 0, tid: d.tid || "10:00", sortiment: d.sortiment };
+    }
+    sparaKorg(); ritaKorg();
+  }
+
+  function ritaKorg() {
+    // vinraderna
+    Object.keys(artiklar).forEach(function (nr) {
+      var a = artiklar[nr], p = korg[nr], vald = !!p;
+      a.classList.toggle("i-korg", vald);
+      var b = a.querySelector(".valj");
+      b.setAttribute("aria-pressed", vald);
+      b.setAttribute("aria-label", (vald ? "Ta bort " : "Lägg ") + a.dataset.namn + (vald ? " från varukorgen" : " i varukorgen"));
+      b.querySelector(".plus").style.display = vald ? "none" : "";
+      b.querySelector(".bock").style.display = vald ? "" : "none";
+      var rad = a.querySelector(".antal");
+      rad.classList.toggle("dold", !vald);
+      if (vald) { rad.querySelector("output").textContent = p.antal; rad.querySelector(".delsumma").textContent = "= " + kr(p.pris * p.antal); }
+    });
+    // listen längst ner
+    var bar = $("korgbar"), datumLista = slappDatum();
+    var antalViner = Object.keys(korg).length;
+    $("korg-antal").textContent = antalViner;
+    var visaDatum = st.datum && poster(st.datum).length ? st.datum : (datumLista.length === 1 ? datumLista[0] : "");
+    if (!antalViner) { bar.classList.add("dold"); document.body.classList.remove("har-korg"); }
+    else {
+      bar.classList.remove("dold"); document.body.classList.add("har-korg");
+      if (visaDatum) {
+        var l = poster(visaDatum);
+        $("korgbar-rubrik").textContent = "Varukorg " + datumText(visaDatum).replace(/^\S+ /, "");
+        $("korgbar-summa").textContent = l.length + (l.length === 1 ? " vin · " : " viner · ") + flaskText(flaskor(l)) + " · " + kr(summa(l));
+        bar.dataset.datum = visaDatum;
+      } else {
+        var alla = Object.keys(korg).map(function (nr) { return korg[nr]; });
+        $("korgbar-rubrik").textContent = "Mina varukorgar";
+        $("korgbar-summa").textContent = datumLista.length + " släpp · " + flaskText(flaskor(alla)) + " · " + kr(summa(alla));
+        bar.dataset.datum = "";
+      }
+    }
+    if (oppetArk === "korg") ritaKorgArk(aktuelltDatum);
+    if (oppetArk === "oversikt") ritaOversikt();
+    if (st.korg) rita();
+  }
+
+  // ---------- ark ----------
+  var oppetArk = "", aktuelltDatum = "", fokusFore = null;
+  function oppna(id) {
+    fokusFore = document.activeElement;
+    ["ark-korg", "ark-oversikt"].forEach(function (x) { $(x).classList.toggle("dold", x !== id); });
+    $("ark-bakgrund").classList.remove("dold");
+    oppetArk = id === "ark-korg" ? "korg" : "oversikt";
+    document.documentElement.style.overflow = "hidden";
+    var s = $(id).querySelector("[data-stang]"); if (s) s.focus();
+  }
+  function stang() {
+    ["ark-korg", "ark-oversikt", "ark-bakgrund"].forEach(function (x) { $(x).classList.add("dold"); });
+    oppetArk = ""; document.documentElement.style.overflow = "";
+    $("korg-status").textContent = ""; $("korg-text").classList.add("dold");
+    if (fokusFore && fokusFore.focus) fokusFore.focus();
+  }
+  document.querySelectorAll("[data-stang]").forEach(function (b) { b.onclick = stang; });
+  $("ark-bakgrund").onclick = stang;
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && oppetArk) stang(); });
+
+  function kalStatus(datum) {
+    if (!kalSparad[datum]) return "";
+    return kalSparad[datum] === signatur(datum) ? "ok" : "andrad";
+  }
+
+  function ritaKorgArk(datum) {
+    aktuelltDatum = datum;
+    var l = poster(datum);
+    if (!l.length) { stang(); if (Object.keys(korg).length) visaOversikt(); return; }
+    var forsta = l[0];
+    $("ark-korg-etikett").textContent = "Varukorg · säljstart " + datumText(datum).replace(/^(\S+)/, function (m) { return m.slice(0, 3); }) + " kl " + forsta.tid;
+    $("ark-korg-rubrik").textContent = stor(datumText(datum));
+    var rader = $("ark-korg-rader"); rader.textContent = "";
+    l.forEach(function (p) {
+      var r = document.createElement("div"); r.className = "korgrad";
+      r.appendChild(flaskElement(p.bild, p.typ));
+      var mitt = document.createElement("div");
+      var n = document.createElement("div"); n.className = "n"; n.textContent = p.namn;
+      var m = document.createElement("div"); m.className = "m"; m.textContent = "nr " + p.nr + " · " + kr(p.pris);
+      var steg = document.createElement("span"); steg.className = "steg";
+      [["-1", "−", "En flaska färre"], ["0", "", ""], ["1", "+", "En flaska till"]].forEach(function (x) {
+        if (x[0] === "0") { var o = document.createElement("output"); o.textContent = p.antal; steg.appendChild(o); return; }
+        var b = document.createElement("button"); b.type = "button"; b.textContent = x[1]; b.setAttribute("aria-label", x[2] + ": " + p.namn);
+        b.onclick = function () { sattAntal(p.nr, p.antal + (+x[0])); };
+        steg.appendChild(b);
+      });
+      mitt.appendChild(n); mitt.appendChild(m); mitt.appendChild(steg);
+      var sum = document.createElement("span"); sum.className = "sum"; sum.textContent = kr(p.pris * p.antal);
+      r.appendChild(mitt); r.appendChild(sum); rader.appendChild(r);
+    });
+    $("ark-korg-flaskor").textContent = flaskText(flaskor(l));
+    $("ark-korg-summa").textContent = kr(summa(l));
+    var varn = $("ark-korg-varningar"); varn.textContent = "";
+    l.filter(function (p) { return p.flaskor && p.flaskor <= 600; }).forEach(function (p) {
+      var v = document.createElement("div"); v.className = "varning";
+      v.textContent = "Bara " + p.flaskor + " flaskor av " + p.namn + ". Beställ direkt vid säljstart.";
+      varn.appendChild(v);
+    });
+    var ks = kalStatus(datum);
+    $("korg-kalender").textContent = ks === "ok" ? "✓ Finns i kalendern · lägg till igen" : ks === "andrad" ? "Ändrad sedan sist · lägg till i kalendern igen" : "Lägg till i kalendern";
+    var sb = $("korg-sb-lankar"); sb.textContent = "";
+    l.forEach(function (p) {
+      var a = document.createElement("a"); a.href = p.url || ("https://www.systembolaget.se/sok/?textQuery=" + p.nr);
+      a.target = "_blank"; a.rel = "noopener"; a.textContent = p.namn + " (nr " + p.nr + ") ↗"; sb.appendChild(a);
+    });
+    $("korg-tom").textContent = "Töm varukorgen"; $("korg-tom").classList.remove("fara"); delete $("korg-tom").dataset.bekrafta;
+  }
+  function visaKorg(datum) { ritaKorgArk(datum); if (poster(datum).length) oppna("ark-korg"); }
+
+  function ritaOversikt() {
+    var lista = slappDatum(), behallare = $("oversikt-kort"); behallare.textContent = "";
+    var allt = [];
+    lista.forEach(function (d) {
+      var l = poster(d); allt = allt.concat(l);
+      var k = document.createElement("button"); k.type = "button"; k.className = "korgkort";
+      var h = document.createElement("div"); h.className = "h";
+      var b = document.createElement("b"); b.textContent = stor(datumText(d)) + (d < IDAG ? " (släppt)" : "");
+      var s = document.createElement("span"); s.textContent = kr(summa(l));
+      h.appendChild(b); h.appendChild(s);
+      var u = document.createElement("div"); u.className = "u";
+      u.textContent = (l[0].sortiment || "Släpp") + " · " + flaskText(flaskor(l)) + " · säljstart " + l[0].tid;
+      var r = document.createElement("div"); r.className = "r";
+      var mf = document.createElement("div"); mf.className = "miniflaskor";
+      l.forEach(function (p) { for (var i = 0; i < Math.min(p.antal, 6); i++) mf.appendChild(flaskElement(p.bild, p.typ)); });
+      var ks = kalStatus(d), km = document.createElement("span");
+      km.className = "kalmarke" + (ks ? " " + ks : "");
+      km.textContent = ks === "ok" ? "✓ I kalendern" : ks === "andrad" ? "Ändrad, lägg till igen" : "Inte i kalendern";
+      r.appendChild(mf); r.appendChild(km);
+      k.appendChild(h); k.appendChild(u); k.appendChild(r);
+      k.setAttribute("aria-label", "Öppna varukorgen för " + datumText(d));
+      k.onclick = function () { visaKorg(d); };
+      behallare.appendChild(k);
+    });
+    $("oversikt-tom").classList.toggle("dold", lista.length > 0);
+    $("oversikt-summa-rad").classList.toggle("dold", !lista.length);
+    $("oversikt-flaskor").textContent = "Totalt " + flaskText(flaskor(allt));
+    $("oversikt-summa").textContent = kr(summa(allt));
+  }
+  function visaOversikt() { ritaOversikt(); oppna("ark-oversikt"); }
+
+  // ---------- kalender (.ics) ----------
+  function stockholmTillUtc(datum, tid) {
+    // Tolkar datum+tid som svensk tid och räknar fram UTC (hanterar sommartid)
+    var gissning = new Date(datum + "T" + tid + ":00Z");
+    var delar = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Stockholm", hour12: false,
+      year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }).formatToParts(gissning);
+    var v = {}; delar.forEach(function (x) { v[x.type] = x.value; });
+    var somLokal = Date.UTC(+v.year, +v.month - 1, +v.day, +v.hour % 24, +v.minute);
+    return new Date(gissning.getTime() - (somLokal - gissning.getTime()));
+  }
+  function icsTid(d) { return d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, ""); }
+  function icsText(t) { return String(t).replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n"); }
+  function vik(rad) {
+    var ut = [], bytes = new TextEncoder(), del = "", n = 0;
+    Array.from(rad).forEach(function (c) {
+      var l = bytes.encode(c).length;
+      if (n + l > (ut.length ? 74 : 75)) { ut.push(del); del = ""; n = 0; }
+      del += c; n += l;
+    });
+    ut.push(del);
+    return ut.join("\r\n ");
+  }
+  function skapaIcs(datum) {
+    var l = poster(datum), tid = l[0].tid || "10:00";
+    var start = stockholmTillUtc(datum, tid), slut = new Date(start.getTime() + 30 * 60000);
+    var dagen = new Date(datum + "T12:00:00Z"); dagen.setUTCDate(dagen.getUTCDate() - 1);
+    var kvallen = stockholmTillUtc(dagen.toISOString().slice(0, 10), "19:00");
+    var sidan = location.href.split("#")[0] + "#d-" + datum;
+    var text = l.map(function (p) { return p.antal + " × " + p.namn + " (nr " + p.nr + ") " + kr(p.pris); }).join("\n")
+      + "\n\nTotalt " + flaskText(flaskor(l)) + ", " + kr(summa(l)) + "\nBeställ hos Systembolaget. Släppet: " + sidan;
+    var titel = "Vinsläpp: " + flaskText(flaskor(l)) + ", " + kr(summa(l));
+    var rader = [
+      "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Vinslappen//Varukorg//SV", "CALSCALE:GREGORIAN", "METHOD:PUBLISH",
+      "BEGIN:VEVENT",
+      "UID:vinslapp-" + datum + "@vinslappen",
+      "DTSTAMP:" + icsTid(new Date()),
+      "DTSTART:" + icsTid(start), "DTEND:" + icsTid(slut),
+      "SUMMARY:" + icsText(titel),
+      "DESCRIPTION:" + icsText(text),
+      "URL:" + sidan,
+      "BEGIN:VALARM", "ACTION:DISPLAY", "DESCRIPTION:" + icsText("I morgon kl " + tid + ": " + titel), "TRIGGER;VALUE=DATE-TIME:" + icsTid(kvallen), "END:VALARM",
+      "BEGIN:VALARM", "ACTION:DISPLAY", "DESCRIPTION:" + icsText("Om 15 minuter: " + titel), "TRIGGER:-PT15M", "END:VALARM",
+      "END:VEVENT", "END:VCALENDAR"
+    ];
+    return rader.map(vik).join("\r\n") + "\r\n";
+  }
+
+  // ---------- knappar ----------
+  document.addEventListener("click", function (ev) {
+    var v = ev.target.closest && ev.target.closest("article.vin .valj");
+    if (v) { var nr = v.closest("article").dataset.nr; sattAntal(nr, korg[nr] ? 0 : 1); return; }
+    var s = ev.target.closest && ev.target.closest("article.vin [data-steg]");
+    if (s) { var nr2 = s.closest("article").dataset.nr; if (korg[nr2]) sattAntal(nr2, korg[nr2].antal + (+s.dataset.steg)); }
+  });
+  $("korgbar-visa").onclick = function () { var d = $("korgbar").dataset.datum; d ? visaKorg(d) : visaOversikt(); };
+  $("korg-oversikt-knapp").onclick = visaOversikt;
+  $("f-korg").onclick = function () { st.korg = !st.korg; rita(); };
+  function status(t) { $("korg-status").textContent = t; }
+  $("korg-kalender").onclick = function () {
+    var d = aktuelltDatum, ics = skapaIcs(d);
+    try {
+      var url = URL.createObjectURL(new Blob([ics], { type: "text/calendar;charset=utf-8" }));
+      var a = document.createElement("a"); a.href = url; a.download = "vinslapp-" + d + ".ics";
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
+      kalSparad[d] = signatur(d); sparaKorg(); ritaKorgArk(d);
+      status("Kalenderhändelsen är skapad. Öppna filen för att lägga till den om telefonen inte frågar direkt.");
+    } catch (e) { status("Kunde inte skapa kalenderhändelsen i den här webbläsaren."); }
+  };
+  function listText(d) {
+    var l = poster(d);
+    return "Vinsläpp " + datumText(d) + " kl " + l[0].tid + "\n" +
+      l.map(function (p) { return p.antal + " × " + p.namn + " (nr " + p.nr + ") " + kr(p.pris); }).join("\n") +
+      "\nTotalt " + flaskText(flaskor(l)) + ", " + kr(summa(l));
+  }
+  $("korg-kopiera").onclick = function () {
+    var t = listText(aktuelltDatum), ta = $("korg-text");
+    var visa = function () { ta.value = t; ta.classList.remove("dold"); ta.focus(); ta.select(); status("Markera och kopiera texten ovan."); };
+    try { navigator.clipboard.writeText(t).then(function () { status("Listan är kopierad."); }, visa); } catch (e) { visa(); }
+  };
+  $("korg-sb").onclick = function () {
+    var l = $("korg-sb-lankar"), oppen = l.classList.toggle("dold") === false;
+    $("korg-sb").setAttribute("aria-expanded", oppen);
+  };
+  $("korg-tom").onclick = function () {
+    var b = $("korg-tom");
+    if (!b.dataset.bekrafta) { b.dataset.bekrafta = "1"; b.textContent = "Tryck igen för att tömma"; b.classList.add("fara"); return; }
+    poster(aktuelltDatum).forEach(function (p) { delete korg[p.nr]; });
+    delete kalSparad[aktuelltDatum]; sparaKorg(); ritaKorg();
+  };
+
+  window.vinslappKorg = ritaKorg;
   fyllPanel();
   berakna();
   rita();
+  ritaKorg();
 })();
 </script>
 {% if not fragment %}
