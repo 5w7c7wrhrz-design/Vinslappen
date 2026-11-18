@@ -9,13 +9,14 @@ import logging
 from datetime import date
 from urllib.parse import quote_plus
 
-from .browser import pause
+from .browser import felsok, pause
 
 log = logging.getLogger(__name__)
 
 SORTIMENT = ["Tillfälligt sortiment", "Webblanseringar"]
 BAS = "https://www.systembolaget.se"
 MAX_SIDOR = 40
+VANTA_MS = 60_000
 KATEGORIER = ["rott-vin", "vitt-vin", "mousserande-vin", "rosevin"]
 
 
@@ -67,35 +68,44 @@ def normalisera(p: dict) -> dict:
     }
 
 
+class SystembolagetFel(RuntimeError):
+    pass
+
+
 class _Sokare:
     """Öppnar sortimentssidor och fångar produktlistan som sidan laddar."""
 
     def __init__(self, ctx):
         self.page = ctx.new_page()
-        self.svar: list[dict] = []
-        self.page.on("response", self._on_response)
 
-    def _on_response(self, resp):
-        if "productsearch/search" in resp.url and resp.status == 200:
+    def _ladda(self, url: str) -> dict:
+        """Öppnar sidan och väntar bara på produktlistan (inte på att all trafik tystnat)."""
+        senaste_fel: Exception | None = None
+        for forsok in (1, 2):
             try:
-                self.svar.append(resp.json())
-            except Exception:  # noqa: BLE001
-                pass
+                with self.page.expect_response(
+                    lambda r: "productsearch/search" in r.url and r.request.method == "GET",
+                    timeout=VANTA_MS,
+                ) as info:
+                    self.page.goto(url, wait_until="domcontentloaded", timeout=VANTA_MS)
+                svar = info.value
+                if svar.status != 200:
+                    raise SystembolagetFel(f"produktsökningen svarade {svar.status}")
+                return svar.json()
+            except Exception as e:  # noqa: BLE001
+                senaste_fel = e
+                log.warning("Systembolaget: försök %s misslyckades för %s: %s", forsok, url, e)
+                pause()
+        felsok(self.page, "systembolaget")
+        raise SystembolagetFel(f"kunde inte läsa {url}: {senaste_fel}")
 
     def sok(self, fran: date, till: date, kategori: str = "") -> tuple[dict[str, dict], int]:
         """Alla sidor för en sökning. Returnerar (produkter, antal enligt Systembolaget)."""
         produkter: dict[str, dict] = {}
         totalt = 0
         for sida in range(1, MAX_SIDOR + 1):
-            self.svar.clear()
-            self.page.goto(sok_url(fran, till, sida, kategori), wait_until="networkidle",
-                           timeout=90_000)
-            self.page.wait_for_timeout(300)
+            data = self._ladda(sok_url(fran, till, sida, kategori))
             pause()
-            if not self.svar:
-                log.warning("Systembolaget: inget svar (%s %s–%s sida %s)", kategori, fran, till, sida)
-                break
-            data = self.svar[-1]
             for p in data.get("products") or []:
                 if p.get("categoryLevel1") == "Vin":
                     produkter[p["productNumber"]] = p
@@ -122,11 +132,14 @@ def hamta_slapp(ctx, fran: date, till: date) -> list[dict]:
         log.info("Systembolaget: %s släppdatum, %s viner enligt sökningen", len(datum), totalt)
         for d in datum:
             dag = date.fromisoformat(d)
-            hittade, antal = s.sok(dag, dag)
-            alla.update(hittade)
-            if len(hittade) < antal:
-                for kat in KATEGORIER:
-                    alla.update(s.sok(dag, dag, kat)[0])
+            try:
+                hittade, antal = s.sok(dag, dag)
+                alla.update(hittade)
+                if len(hittade) < antal:
+                    for kat in KATEGORIER:
+                        alla.update(s.sok(dag, dag, kat)[0])
+            except SystembolagetFel as e:
+                log.warning("Systembolaget %s: hoppar över kompletteringen (%s)", d, e)
             log.info("Systembolaget %s: %s viner", d,
                      sum(1 for p in alla.values() if p.get("productLaunchDate", "")[:10] == d))
         if len(alla) < totalt:

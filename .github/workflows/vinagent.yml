@@ -42,6 +42,15 @@ jobs:
       - name: Hämta släpp och bygg sidan
         run: python -m vinagent --dagar "${{ inputs.dagar || '60' }}" --ut site
 
+      - name: Spara felsökning om något gick fel
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: felsokning
+          path: felsokning/
+          if-no-files-found: ignore
+          retention-days: 7
+
       - name: Spara sidan som nedladdning
         uses: actions/upload-artifact@v4
         with:
