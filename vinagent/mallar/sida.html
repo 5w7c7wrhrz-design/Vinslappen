@@ -1,0 +1,456 @@
+{% if not fragment %}<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+{% endif %}
+<title>Vinsläppen</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: en smal läskolumn. Överst köpförslagen, sedan ett avsnitt per släppdatum
+   där varje vin är en rad med betyget som stor siffra till vänster. */
+:root {
+  --bg: #f6f5f7; --yta: #ffffff; --linje: #e3dfe6; --fg: #1d1a21; --dov: #6b6573;
+  --vin: #8a1c3c; --vin-svag: #f6e6ec; --grön: #2f6b4a; --grön-svag: #e3f1e8;
+  --gul: #8a5a00; --gul-svag: #fbf0d9;
+  --rott: #8a1c3c; --vitt: #c9a227; --rose: #e48ba3; --bubbel: #b8b08a; --sott: #a55a1d; --ovrigt: #8c8494;
+  --display: "Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --text: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --siffror: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #141117; --yta: #1d1921; --linje: #322c38; --fg: #ece8f0; --dov: #a39cab;
+  --vin: #f07b9c; --vin-svag: #3a1a26; --grön: #7fd3a3; --grön-svag: #16301f;
+  --gul: #e9b860; --gul-svag: #33270f; --rott: #d9466e; --vitt: #e2c45a; --rose: #f2a7bb;
+  --bubbel: #d6cfa4; --sott: #d88a4a; --ovrigt: #a39cab; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #141117; --yta: #1d1921; --linje: #322c38; --fg: #ece8f0; --dov: #a39cab;
+  --vin: #f07b9c; --vin-svag: #3a1a26; --grön: #7fd3a3; --grön-svag: #16301f;
+  --gul: #e9b860; --gul-svag: #33270f; --rott: #d9466e; --vitt: #e2c45a; --rose: #f2a7bb;
+  --bubbel: #d6cfa4; --sott: #d88a4a; --ovrigt: #a39cab; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 var(--text); }
+.wrap { max-width: 860px; margin: 0 auto; padding-block: 28px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+a { color: var(--vin); }
+a:focus-visible, button:focus-visible, summary:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--vin); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2rem, 6vw, 2.8rem); font-weight: 700; letter-spacing: -0.02em; line-height: 1.05; }
+h2 { font-size: 1.45rem; font-weight: 700; letter-spacing: -0.01em; }
+.etikett { font: 600 0.72rem/1 var(--text); letter-spacing: 0.08em; text-transform: uppercase; color: var(--dov); }
+.ingress { color: var(--dov); max-width: 62ch; margin: 10px 0 0; }
+header { display: grid; gap: 6px; margin-bottom: 26px; }
+.siffror { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 14px; }
+.siffror div { display: grid; gap: 2px; }
+.siffror b { font: 700 1.5rem/1 var(--siffror); font-variant-numeric: tabular-nums; }
+
+/* filter */
+.filter { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0 0 22px; padding: 10px 0;
+  border-block: 1px solid var(--linje); position: sticky; top: env(safe-area-inset-top, 0px); background: var(--bg); z-index: 5; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.chip { font: 500 0.85rem var(--text); border: 1px solid var(--linje); background: var(--yta); color: var(--fg);
+  border-radius: 999px; padding: 5px 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.chip[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.prick { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex: none; }
+.filter label { font-size: 0.85rem; color: var(--dov); display: inline-flex; gap: 6px; align-items: center; }
+.filter select { font: inherit; padding: 4px 8px; border: 1px solid var(--linje); border-radius: 8px; background: var(--yta); color: var(--fg); max-width: 100%; }
+.filter label { min-width: 0; }
+.filter input[type=number] { width: 84px; font: inherit; padding: 4px 8px; border: 1px solid var(--linje); border-radius: 8px; background: var(--yta); color: var(--fg); }
+
+/* köpförslag */
+.kop { background: var(--yta); border: 1px solid var(--linje); border-radius: 14px; padding: 18px; margin-bottom: 36px; }
+.kop h2 { margin-bottom: 4px; }
+.kop ol { list-style: none; margin: 12px 0 0; padding: 0; display: grid; }
+.kop li { display: grid; grid-template-columns: 52px 1fr auto; gap: 12px; align-items: baseline; padding: 9px 0; border-top: 1px solid var(--linje); }
+.kop li > div { min-width: 0; }
+.kop .p { font: 700 1.25rem/1 var(--siffror); color: var(--vin); }
+.kop .n { font-weight: 600; }
+.kop .m { color: var(--dov); font-size: 0.85rem; }
+.kop .d { font: 500 0.82rem var(--siffror); color: var(--dov); text-align: right; white-space: nowrap; }
+
+/* släpp */
+section.slapp { margin-bottom: 40px; }
+.slapp-huvud { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; margin-bottom: 8px; }
+.slapp-huvud .meta { color: var(--dov); font-size: 0.88rem; }
+.slapp.passerat .slapp-huvud h2 { color: var(--dov); }
+.vin { scroll-margin-top: 120px; display: grid; grid-template-columns: 64px 1fr; gap: 14px; padding: 14px 0; border-top: 1px solid var(--linje); }
+.vin > div { min-width: 0; }
+.betyg { display: grid; justify-items: center; align-content: start; gap: 4px; padding-top: 2px; }
+.betyg b { font: 700 1.6rem/1 var(--siffror); font-variant-numeric: tabular-nums; color: var(--fg); }
+.betyg.provat b { color: var(--vin); }
+.betyg.gissat b { color: var(--dov); font-weight: 500; font-size: 1.3rem; }
+.betyg small { font-size: 0.66rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--dov); text-align: center; line-height: 1.2; }
+.namnrad { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.namnrad h3 { font-size: 1.08rem; font-weight: 700; line-height: 1.25; }
+.namnrad .prick { transform: translateY(-1px); }
+.fakta { color: var(--dov); font-size: 0.88rem; margin-top: 2px; }
+.fakta .pris { color: var(--fg); font-weight: 600; font-family: var(--siffror); font-size: 0.86rem; }
+.taggar { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 7px; }
+.tagg { font: 600 0.72rem/1 var(--text); padding: 4px 8px; border-radius: 6px; background: var(--linje); color: var(--fg); }
+.tagg.kop-t { background: var(--vin); color: var(--yta); }
+.tagg.fynd { background: var(--grön-svag); color: var(--grön); }
+.tagg.topp { background: var(--vin-svag); color: var(--vin); }
+.tagg.stil { background: var(--gul-svag); color: var(--gul); }
+details { margin-top: 8px; }
+summary { cursor: pointer; color: var(--vin); font-size: 0.88rem; font-weight: 500; }
+.recension { margin: 10px 0 0; padding-left: 12px; border-left: 2px solid var(--linje); font-size: 0.9rem; white-space: pre-line; }
+.recension .vem { color: var(--dov); font-size: 0.8rem; white-space: normal; }
+.lankar { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 10px; font-size: 0.85rem; }
+.sb-smak { color: var(--dov); font-size: 0.88rem; margin-top: 8px; }
+.tomt { color: var(--dov); padding: 18px 0; }
+footer { color: var(--dov); font-size: 0.82rem; border-top: 1px solid var(--linje); padding-top: 16px; display: grid; gap: 6px; max-width: 70ch; }
+.dold { display: none !important; }
+.chip.instl { border-style: dashed; }
+.chip.instl[aria-expanded="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); border-style: solid; }
+.panel { background: var(--yta); border: 1px solid var(--linje); border-radius: 14px; padding: 18px; margin: -8px 0 28px; display: grid; gap: 16px; }
+.panel h2 { font-size: 1.2rem; }
+.panel p { margin: 0; color: var(--dov); font-size: 0.88rem; max-width: 62ch; }
+.falt { display: grid; gap: 6px; min-width: 0; }
+.falt > label { font-weight: 600; font-size: 0.9rem; }
+.falt small { color: var(--dov); font-size: 0.8rem; }
+.falt input { font: inherit; padding: 8px 10px; border: 1px solid var(--linje); border-radius: 8px; background: var(--bg); color: var(--fg); width: 100%; min-width: 0; }
+.tal { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; }
+.forslag { display: flex; flex-wrap: wrap; gap: 6px; }
+.forslag button { font: 500 0.78rem var(--text); border: 1px solid var(--linje); background: transparent; color: var(--dov); border-radius: 999px; padding: 3px 9px; cursor: pointer; }
+.forslag button[aria-pressed="true"] { background: var(--gul-svag); color: var(--gul); border-color: transparent; }
+.knappar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.knapp { font: 600 0.9rem var(--text); border-radius: 8px; padding: 8px 14px; cursor: pointer; border: 1px solid var(--linje); background: var(--yta); color: var(--fg); }
+.knapp.primar { background: var(--vin); border-color: var(--vin); color: var(--yta); }
+.status { color: var(--grön); font-size: 0.88rem; font-weight: 500; }
+#instl-json { width: 100%; font: 0.8rem var(--siffror); background: var(--bg); color: var(--fg); border: 1px solid var(--linje); border-radius: 8px; padding: 8px; }
+@media (max-width: 520px) {
+  .vin { grid-template-columns: 50px 1fr; gap: 10px; }
+  .betyg b { font-size: 1.3rem; }
+  .kop li { grid-template-columns: 44px 1fr; }
+  .kop .d { grid-column: 2; text-align: left; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+{% if not fragment %}
+</head>
+<body>
+{% endif %}
+<div class="wrap">
+<header>
+  <span class="etikett">Systembolaget · tillfälligt sortiment &amp; webblanseringar</span>
+  <h1>Vinsläppen</h1>
+  <p class="ingress">Alla viner som släpps de kommande veckorna, sorterade per säljstart. Betyget är
+    finewines.se-provarnas poäng (100-poängsskala) när vinet är provat, annars en försiktig uppskattning i grått.</p>
+  <div class="siffror">
+    <div><span class="etikett">Viner</span><b>{{ antal }}</b></div>
+    <div><span class="etikett">Provade på forumet</span><b>{{ provade }}</b></div>
+    <div><span class="etikett">Köpförslag</span><b id="antal-kop">{{ kop|length }}</b></div>
+    {% if kommande %}<div><span class="etikett">Nästa släpp</span><b>{{ kommande.datum[5:] }}</b></div>{% endif %}
+  </div>
+</header>
+
+<div class="filter" role="group" aria-label="Filtrera viner">
+  <label for="f-datum">Släpp <select id="f-datum">
+    <option value="">Alla släpp</option>
+    {% for s in slapp %}<option value="{{ s.datum }}">{{ s.rubrik|capitalize }}{% if s.passerat %} (släppt){% endif %} · {{ s.viner|length }}</option>{% endfor %}
+  </select></label>
+  <label for="f-sort">Sortera <select id="f-sort">
+    <option value="rank">Bäst först</option>
+    <option value="betyg">Betyg</option>
+    <option value="prisvarde">Prisvärde</option>
+    <option value="pris-upp">Pris, lägst först</option>
+    <option value="pris-ned">Pris, högst först</option>
+  </select></label>
+  <button class="chip" type="button" id="f-kop" aria-pressed="false">Bara köpförslag</button>
+  <button class="chip" type="button" id="f-provat" aria-pressed="false">Bara provade</button>
+  {% for t in typer %}
+  <button class="chip typ" type="button" id="f-typ-{{ t }}" data-typ="{{ t }}" aria-pressed="false"><span class="prick" style="background: var(--{{ t }})"></span>{{ {"rott":"Rött","vitt":"Vitt","rose":"Rosé","bubbel":"Mousserande","sott":"Sött & starkt","ovrigt":"Övrigt"}[t] }}</button>
+  {% endfor %}
+  <label for="f-max">Maxpris <input type="number" id="f-max" inputmode="numeric" min="0" step="50" placeholder="kr"></label>
+  <button class="chip instl" type="button" id="instl-knapp" aria-expanded="false" aria-controls="instl">Mina preferenser</button>
+</div>
+
+<section class="panel dold" id="instl" aria-labelledby="instl-rubrik">
+  <div><h2 id="instl-rubrik">Mina preferenser</h2>
+    <p>Styr vilka viner som blir köpförslag och får etiketten <em>Din stil</em>. Ändringarna gäller direkt och sparas i den här webbläsaren.</p></div>
+  <div class="falt">
+    <label for="p-druvor">Favoritdruvor</label>
+    <input id="p-druvor" type="text" autocomplete="off" placeholder="t.ex. Nebbiolo, Riesling">
+    <small>Separera med komma, eller tryck på druvor från släppen:</small>
+    <div class="forslag" id="p-druvforslag">{% for d in vanliga_druvor %}<button type="button" data-druva="{{ d }}" aria-pressed="false">{{ d }}</button>{% endfor %}</div>
+  </div>
+  <div class="falt">
+    <label for="p-omraden">Länder och områden</label>
+    <input id="p-omraden" type="text" autocomplete="off" placeholder="t.ex. Piemonte, Tyskland, Rhône">
+  </div>
+  <div class="falt">
+    <label for="p-producenter">Producenter du följer</label>
+    <input id="p-producenter" type="text" autocomplete="off" placeholder="t.ex. Vajra, Bouland">
+  </div>
+  <div class="tal">
+    <div class="falt"><label for="p-maxpris">Maxpris för köpförslag</label><input id="p-maxpris" type="number" inputmode="numeric" min="0" step="50" placeholder="ingen gräns"><small>kronor per flaska</small></div>
+    <div class="falt"><label for="p-minbetyg">Lägsta betyg</label><input id="p-minbetyg" type="number" inputmode="numeric" min="80" max="100" step="1"><small>forumpoäng (100-skala)</small></div>
+    <div class="falt"><label for="p-perslapp">Köpförslag per släpp</label><input id="p-perslapp" type="number" inputmode="numeric" min="1" max="50" step="1"><small>högst så här många</small></div>
+  </div>
+  <div class="knappar">
+    <button class="knapp" type="button" id="p-aterstall">Återställ standard</button>
+    <button class="knapp" type="button" id="p-kopiera">Kopiera som preferenser.json</button>
+    <span class="status" id="p-status" role="status"></span>
+  </div>
+  <textarea id="instl-json" class="dold" rows="9" readonly aria-label="Preferenser som JSON"></textarea>
+  <p>Inställningarna finns bara i den här webbläsaren. Vill du att de gäller överallt och i den dagliga körningen, kopiera dem och klistra in i <code>vinagent/preferenser.json</code> i repot.</p>
+</section>
+
+<section class="kop" aria-labelledby="kop-rubrik">
+  <span class="etikett" id="kop-regel">Från {{ pref.get("minbetyg_kopforslag", 89) }} poäng, eller ett poäng lägre om fynd eller din stil</span>
+  <h2 id="kop-rubrik">Köpförslag</h2>
+  <p class="tomt{% if kop %} dold{% endif %}" id="kop-tomt">Inga köpförslag ännu. Forumets provare brukar lägga upp sina anteckningar några dagar före släppet, så titta in igen.</p>
+  <ol id="kop-lista">
+    {% for v in kop %}
+    <li data-datum="{{ v.lansering }}">
+      <span class="p">{{ v.betyg|poang }}</span>
+      <div><div class="n"><a href="#v-{{ v.nr }}" data-hopp="{{ v.lansering }}">{{ v.namn }}</a></div>
+        <div class="m">{{ v.pris|kr }}{% if v.land %} · {{ v.land }}{% endif %}{% if v.etiketter %} · {{ v.etiketter|join(", ") }}{% endif %}</div></div>
+      <span class="d">{{ svenskt_datum(v.lansering) }}</span>
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+
+{% for s in slapp %}
+<section class="slapp{% if s.passerat %} passerat{% endif %}" id="d-{{ s.datum }}" aria-labelledby="h-{{ s.datum }}">
+  <div class="slapp-huvud">
+    <h2 id="h-{{ s.datum }}">{{ s.rubrik|capitalize }}</h2>
+    <span class="meta">{{ s.typer|join(" & ") }} · {{ s.viner|length }} viner · {{ s.provade }} provade{% if s.passerat %} · redan släppt{% elif s.dagar_kvar == 0 %} · i dag{% else %} · om {{ s.dagar_kvar }} {{ "dag" if s.dagar_kvar == 1 else "dagar" }}{% endif %}</span>
+  </div>
+  {% for v in s.viner %}
+  <article class="vin" id="v-{{ v.nr }}" data-typ="{{ typklass(v) }}" data-pris="{{ v.pris or 0 }}" data-kop="{{ 1 if v.kopforslag else 0 }}" data-provat="{{ 1 if v.betyg_kalla == 'finewines' else 0 }}" data-betyg="{{ v.betyg }}" data-prisvarde="{{ v.prisvarde }}" data-rank="{{ v.rank }}" data-datum="{{ v.lansering }}" data-datumtext="{{ svenskt_datum(v.lansering) }}" data-namn="{{ v.namn }}" data-land="{{ v.land }}" data-prisvisning="{{ v.pris|kr }}" data-poang="{{ v.betyg|poang }}" data-druvor="{{ v.druvor|join('|')|lower }}" data-plats="{{ (v.land ~ ' ' ~ v.region)|lower }}" data-prod="{{ (v.producent ~ ' ' ~ v.namn)|lower }}" data-fasta="{{ v.etiketter|reject('equalto', 'Din stil')|join(', ') }}">
+    <div class="betyg {{ 'provat' if v.betyg_kalla == 'finewines' else 'gissat' }}">
+      <b>{{ v.betyg|poang }}</b>
+      <small>{% if v.betyg_kalla == 'finewines' %}finewines{% if v.recensioner|selectattr("poang")|list|length > 1 %} ({{ v.recensioner|selectattr("poang")|list|length }}){% endif %}{% else %}uppskattat{% endif %}</small>
+    </div>
+    <div>
+      <div class="namnrad"><span class="prick" style="background: var(--{{ typklass(v) }})" title="{{ v.typ }}"></span><h3>{{ v.namn }}</h3></div>
+      <div class="fakta">
+        <span class="pris">{{ v.pris|kr }}</span>{% if v.volym_ml and v.volym_ml != 750 %} ({{ v.volym_ml|int }} ml){% endif %}
+        {% if v.argang %} · {{ v.argang }}{% endif %}
+        {% if v.land %} · {{ v.land }}{% if v.region %}, {{ v.region }}{% endif %}{% endif %}
+        {% if v.druvor %} · {{ v.druvor|join(", ") }}{% endif %}
+        {% if v.stil %} · {{ v.stil }}{% endif %}
+        {% if v.flaskor %} · {{ v.flaskor }} flaskor{% endif %}
+        · nr {{ v.nr }}
+      </div>
+      <div class="taggar">
+        <span class="tagg kop-t{% if not v.kopforslag %} dold{% endif %}" data-roll="kop">Köpförslag</span>
+        {% for e in v.etiketter if e != "Din stil" %}<span class="tagg {{ {'Fynd':'fynd','Toppvin':'topp'}.get(e, '') }}">{{ e }}</span>{% endfor %}
+        <span class="tagg stil{% if not v.preferenstraffar %} dold{% endif %}" data-roll="stil">Din stil: {{ v.preferenstraffar|join(", ") }}</span>
+        {% if v.sortiment == "Webblanseringar" %}<span class="tagg">Webblansering</span>{% endif %}
+        {% if v.betyg_kalla == 'finewines' %}<span class="tagg">Prisvärde {{ "%+.1f"|format(v.prisvarde)|replace(".", ",") }}</span>{% endif %}
+      </div>
+      <details>
+        <summary>{% if v.recensioner %}Läs {{ v.recensioner|length }} {{ "anteckning" if v.recensioner|length == 1 else "anteckningar" }} från finewines.se{% else %}Mer om vinet{% endif %}{% if v.omnamnanden %} · nämns i {{ v.omnamnanden }} svar{% endif %}</summary>
+        {% for r in v.recensioner %}
+        <div class="recension"><div class="vem">{{ r.forfattare or "Forumet" }}{% if r.poang %} · {{ r.poang|poang }} p{% endif %} · <a href="{{ r.url }}" target="_blank" rel="noopener">inlägget</a></div>{{ r.text }}</div>
+        {% endfor %}
+        {% if v.smak %}<p class="sb-smak"><span class="etikett">Systembolaget</span><br>{{ v.smak }}{% if v.passar_till %} Passar till {{ v.passar_till|join(", ")|lower }}.{% endif %}</p>{% endif %}
+        {% if not v.recensioner and not v.smak %}<p class="sb-smak">Ingen provning publicerad ännu.</p>{% endif %}
+      </details>
+      <div class="lankar">
+        <a href="{{ v.url }}" target="_blank" rel="noopener">Systembolaget</a>
+        <a href="https://www.vivino.com/search/wines?q={{ v.namn|quote }}" target="_blank" rel="noopener">Sök på Vivino</a>
+        {% if v.trad %}<a href="{{ v.trad.url }}" target="_blank" rel="noopener">Forumtråden</a>{% endif %}
+      </div>
+    </div>
+  </article>
+  {% endfor %}
+  <p class="tomt dold">Inga viner matchar filtret för det här släppet.</p>
+</section>
+{% else %}
+<p class="tomt">Systembolaget har inte publicerat några kommande släpp i perioden.</p>
+{% endfor %}
+
+<footer>
+  <span>Uppdaterad {{ uppdaterad }}. Källor: systembolaget.se och forumet <a href="https://www.finewines.se/forums/lanseringar-fran-systembolaget.51/" target="_blank" rel="noopener">Lanseringar från Systembolaget</a> på finewines.se.</span>
+  <span>Uppskattade betyg bygger på pris, område, ålder och hur mycket vinet diskuteras. De är en gissning och blir aldrig köpförslag på egen hand. Prisvärde visar hur många poäng över eller under det vanliga för prisklassen vinet ligger.</span>
+</footer>
+</div>
+<script>
+(function () {
+  var st = { kop: false, provat: false, typer: new Set(), max: 0, datum: "", sort: "rank" };
+  var datumFinns = {}; document.querySelectorAll("#f-datum option").forEach(function (o) { datumFinns[o.value] = 1; });
+  var KEY = "vinslapp-filter";
+  try { var s = JSON.parse(localStorage.getItem(KEY) || "{}"); st.kop = !!s.kop; st.provat = !!s.provat; st.typer = new Set(s.typer || []); st.max = +s.max || 0; st.sort = s.sort || "rank"; } catch (e) {}
+  var h = (location.hash || "").replace("#d-", "");
+  if (datumFinns[h] && h) st.datum = h;
+  function spara() { try { localStorage.setItem(KEY, JSON.stringify({ kop: st.kop, provat: st.provat, typer: Array.from(st.typer), max: st.max, sort: st.sort })); } catch (e) {} }
+  var STANDARD = {{ pref|tojson }};
+  var PKEY = "vinslapp-preferenser";
+  var pref = Object.assign({}, STANDARD);
+  try { var sp = JSON.parse(localStorage.getItem(PKEY) || "null"); if (sp) pref = Object.assign({}, STANDARD, sp); } catch (e) {}
+  var lista = function (x) { return (x || []).map(function (t) { return String(t).trim(); }).filter(Boolean); };
+  var $ = function (id) { return document.getElementById(id); };
+
+  function traffar(a) {
+    var d = a.dataset, ut = [], druvor = d.druvor ? d.druvor.split("|") : [];
+    lista(pref.favoritdruvor).forEach(function (x) { var l = x.toLowerCase(); if (druvor.indexOf(l) >= 0 || d.namn.toLowerCase().indexOf(l) >= 0) ut.push(x); });
+    lista(pref.favoritomraden).forEach(function (x) { if (d.plats.indexOf(x.toLowerCase()) >= 0) ut.push(x); });
+    lista(pref.favoritproducenter).forEach(function (x) { if (d.prod.indexOf(x.toLowerCase()) >= 0) ut.push(x); });
+    return ut;
+  }
+
+  function berakna() {
+    var min = +pref.minbetyg_kopforslag || 89, maxpris = +pref.maxpris || 0, per = +pref.max_kopforslag_per_slapp || 6;
+    var perDatum = {};
+    document.querySelectorAll("article.vin").forEach(function (a) {
+      var d = a.dataset, t = traffar(a), provat = d.provat === "1", betyg = +d.betyg, pv = +d.prisvarde;
+      var kop = provat && !(maxpris && +d.pris > maxpris) &&
+        (betyg >= min || (betyg >= min - 1 && (pv >= 3 || t.length > 0)));
+      d.rank = (betyg + 0.3 * pv + (t.length ? 1 : 0) - (provat ? 0 : 3)).toFixed(2);
+      var stil = a.querySelector('[data-roll="stil"]');
+      stil.textContent = "Din stil: " + t.join(", "); stil.classList.toggle("dold", !t.length);
+      d.stil = t.length ? "Din stil" : "";
+      if (kop) (perDatum[d.datum] = perDatum[d.datum] || []).push(a);
+      d.kop = "0";
+    });
+    var valda = [];
+    Object.keys(perDatum).forEach(function (k) {
+      perDatum[k].sort(function (x, y) { return y.dataset.rank - x.dataset.rank; });
+      perDatum[k].slice(0, per).forEach(function (a) { a.dataset.kop = "1"; valda.push(a); });
+    });
+    document.querySelectorAll("article.vin").forEach(function (a) { a.querySelector('[data-roll="kop"]').classList.toggle("dold", a.dataset.kop !== "1"); });
+    var idag = "{{ idag }}";
+    valda = valda.filter(function (a) { return a.dataset.datum >= idag; });
+    valda.sort(function (x, y) { return x.dataset.datum < y.dataset.datum ? -1 : x.dataset.datum > y.dataset.datum ? 1 : y.dataset.rank - x.dataset.rank; });
+    var ol = $("kop-lista"); ol.textContent = "";
+    valda.forEach(function (a) {
+      var d = a.dataset, li = document.createElement("li"); li.dataset.datum = d.datum;
+      var p = document.createElement("span"); p.className = "p"; p.textContent = d.poang;
+      var mitt = document.createElement("div"), n = document.createElement("div"), l = document.createElement("a");
+      n.className = "n"; l.href = "#" + a.id; l.dataset.hopp = d.datum; l.textContent = d.namn; n.appendChild(l);
+      var m = document.createElement("div"); m.className = "m";
+      m.textContent = [d.prisvisning, d.land, [d.fasta, d.stil].filter(Boolean).join(", ")].filter(Boolean).join(" · ");
+      mitt.appendChild(n); mitt.appendChild(m);
+      var dt = document.createElement("span"); dt.className = "d"; dt.textContent = d.datumtext;
+      li.appendChild(p); li.appendChild(mitt); li.appendChild(dt); ol.appendChild(li);
+    });
+    $("antal-kop").textContent = valda.length;
+    $("kop-regel").textContent = "Från " + min + " poäng, eller " + (min - 1) + " om fynd eller din stil" + (maxpris ? ", högst " + maxpris + " kr" : "");
+    return valda.length;
+  }
+
+  function fyllPanel() {
+    $("p-druvor").value = lista(pref.favoritdruvor).join(", ");
+    $("p-omraden").value = lista(pref.favoritomraden).join(", ");
+    $("p-producenter").value = lista(pref.favoritproducenter).join(", ");
+    $("p-maxpris").value = pref.maxpris || "";
+    $("p-minbetyg").value = pref.minbetyg_kopforslag || 89;
+    $("p-perslapp").value = pref.max_kopforslag_per_slapp || 6;
+    var valdaDruvor = lista(pref.favoritdruvor).map(function (x) { return x.toLowerCase(); });
+    document.querySelectorAll("#p-druvforslag button").forEach(function (b) { b.setAttribute("aria-pressed", valdaDruvor.indexOf(b.dataset.druva.toLowerCase()) >= 0); });
+  }
+  var delad = function (v) { return v.split(",").map(function (x) { return x.trim(); }).filter(Boolean); };
+  function lasPanel() {
+    pref = {
+      favoritdruvor: delad($("p-druvor").value), favoritomraden: delad($("p-omraden").value),
+      favoritproducenter: delad($("p-producenter").value), maxpris: +$("p-maxpris").value || 0,
+      minbetyg_kopforslag: Math.min(100, Math.max(70, +$("p-minbetyg").value || 89)),
+      max_kopforslag_per_slapp: Math.max(1, +$("p-perslapp").value || 6)
+    };
+  }
+  var statusTimer;
+  function tillampa(meddelande) {
+    try { localStorage.setItem(PKEY, JSON.stringify(pref)); } catch (e) {}
+    var n = berakna(); rita();
+    $("p-status").textContent = meddelande || ("Sparat. " + n + " köpförslag.");
+    clearTimeout(statusTimer); statusTimer = setTimeout(function () { $("p-status").textContent = ""; }, 4000);
+  }
+  ["p-druvor", "p-omraden", "p-producenter", "p-maxpris", "p-minbetyg", "p-perslapp"].forEach(function (id) {
+    $(id).addEventListener("change", function () { lasPanel(); fyllPanel(); tillampa(); });
+  });
+  document.querySelectorAll("#p-druvforslag button").forEach(function (b) {
+    b.onclick = function () {
+      var v = delad($("p-druvor").value), i = v.map(function (x) { return x.toLowerCase(); }).indexOf(b.dataset.druva.toLowerCase());
+      if (i >= 0) v.splice(i, 1); else v.push(b.dataset.druva);
+      $("p-druvor").value = v.join(", "); lasPanel(); fyllPanel(); tillampa();
+    };
+  });
+  $("p-aterstall").onclick = function () {
+    pref = Object.assign({}, STANDARD);
+    try { localStorage.removeItem(PKEY); } catch (e) {}
+    fyllPanel(); var n = berakna(); rita(); $("p-status").textContent = "Återställt. " + n + " köpförslag.";
+  };
+  $("p-kopiera").onclick = function () {
+    var txt = JSON.stringify(Object.assign({}, STANDARD, pref), null, 2), ta = $("instl-json");
+    ta.value = txt;
+    var visa = function () { ta.classList.remove("dold"); ta.focus(); ta.select(); $("p-status").textContent = "Markera och kopiera texten nedan."; };
+    try { navigator.clipboard.writeText(txt).then(function () { $("p-status").textContent = "Kopierat till urklipp."; }, visa); } catch (e) { visa(); }
+  };
+  $("instl-knapp").onclick = function () {
+    var oppen = $("instl").classList.toggle("dold") === false;
+    $("instl-knapp").setAttribute("aria-expanded", oppen);
+    if (oppen) $("instl").scrollIntoView({ block: "nearest" });
+  };
+
+  function rita() {
+    document.getElementById("f-kop").setAttribute("aria-pressed", st.kop);
+    document.getElementById("f-provat").setAttribute("aria-pressed", st.provat);
+    document.querySelectorAll(".chip.typ").forEach(function (b) { b.setAttribute("aria-pressed", st.typer.has(b.dataset.typ)); });
+    document.getElementById("f-max").value = st.max || "";
+    document.getElementById("f-datum").value = st.datum;
+    document.getElementById("f-sort").value = st.sort;
+    var kopSynliga = 0;
+    document.querySelectorAll(".kop li").forEach(function (li) {
+      var ok = !st.datum || li.dataset.datum === st.datum; li.classList.toggle("dold", !ok); if (ok) kopSynliga++;
+    });
+    document.getElementById("kop-tomt").classList.toggle("dold", kopSynliga > 0);
+    document.querySelectorAll("section.slapp").forEach(function (sec) {
+      sec.classList.toggle("dold", !!st.datum && sec.id !== "d-" + st.datum);
+      var arts = Array.prototype.slice.call(sec.querySelectorAll("article.vin"));
+      arts.sort(function (a, b) {
+        var d = a.dataset, e = b.dataset;
+        if (st.sort === "betyg") return (e.betyg - d.betyg) || (e.rank - d.rank);
+        if (st.sort === "prisvarde") return (e.prisvarde - d.prisvarde) || (e.rank - d.rank);
+        if (st.sort === "pris-upp") return (d.pris - e.pris) || (e.rank - d.rank);
+        if (st.sort === "pris-ned") return (e.pris - d.pris) || (e.rank - d.rank);
+        return e.rank - d.rank;
+      });
+      var ankare = sec.querySelector(".tomt");
+      arts.forEach(function (a) { sec.insertBefore(a, ankare); });
+      var synliga = 0;
+      sec.querySelectorAll("article.vin").forEach(function (a) {
+        var ok = (!st.kop || a.dataset.kop === "1") && (!st.provat || a.dataset.provat === "1")
+          && (!st.typer.size || st.typer.has(a.dataset.typ)) && (!st.max || +a.dataset.pris <= st.max);
+        a.classList.toggle("dold", !ok); if (ok) synliga++;
+      });
+      var t = sec.querySelector(".tomt"); if (t) t.classList.toggle("dold", synliga > 0);
+    });
+  }
+  document.getElementById("f-kop").onclick = function () { st.kop = !st.kop; spara(); rita(); };
+  document.getElementById("f-provat").onclick = function () { st.provat = !st.provat; spara(); rita(); };
+  document.querySelectorAll(".chip.typ").forEach(function (b) { b.onclick = function () { var t = b.dataset.typ; st.typer.has(t) ? st.typer.delete(t) : st.typer.add(t); spara(); rita(); }; });
+  document.getElementById("f-datum").onchange = function (e) {
+    st.datum = e.target.value; rita();
+    try { history.replaceState(null, "", st.datum ? "#d-" + st.datum : location.pathname + location.search); } catch (x) {}
+    window.scrollTo({ top: 0 });
+  };
+  window.addEventListener("hashchange", function () { var h = location.hash.replace("#d-", ""); if (datumFinns[h]) { st.datum = h; rita(); } });
+  document.getElementById("f-sort").onchange = function (e) { st.sort = e.target.value; spara(); rita(); };
+  document.getElementById("f-max").oninput = function (e) { st.max = +e.target.value || 0; spara(); rita(); };
+  document.addEventListener("click", function (ev) {
+    var a = ev.target.closest && ev.target.closest("a[data-hopp]");
+    if (!a) return;
+    (function () {
+      ev.preventDefault();
+      if (st.datum && st.datum !== a.dataset.hopp) { st.datum = ""; rita(); }
+      var mal = document.getElementById(a.getAttribute("href").slice(1));
+      if (mal) { mal.scrollIntoView({ block: "start" }); var d = mal.querySelector("details"); if (d) d.open = true; }
+    })();
+  });
+  fyllPanel();
+  berakna();
+  rita();
+})();
+</script>
+{% if not fragment %}
+</body>
+</html>
+{% endif %}

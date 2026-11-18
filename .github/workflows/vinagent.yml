@@ -1,0 +1,70 @@
+name: Vinagent
+
+on:
+  schedule:
+    - cron: "41 4 * * *"   # varje morgon ca 05:41/06:41 svensk tid
+  workflow_dispatch:
+    inputs:
+      dagar:
+        description: "Antal dagar framåt att ta med"
+        type: string
+        default: "60"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: vinagent
+  cancel-in-progress: false
+
+jobs:
+  bygg:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - run: pip install -r requirements.txt pytest
+
+      - name: Installera webbläsaren
+        run: python -m playwright install --with-deps chromium
+
+      - name: Testa
+        run: python -m pytest tests/test_vinagent.py -q
+
+      - name: Hämta släpp och bygg sidan
+        run: python -m vinagent --dagar "${{ inputs.dagar || '60' }}" --ut site
+
+      - name: Spara sidan som nedladdning
+        uses: actions/upload-artifact@v4
+        with:
+          name: vinslappen
+          path: site/
+          retention-days: 14
+
+      - uses: actions/configure-pages@v5
+        continue-on-error: true
+        id: pages
+
+      - uses: actions/upload-pages-artifact@v3
+        if: steps.pages.outcome == 'success'
+        with:
+          path: site/
+
+  publicera:
+    needs: bygg
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4
+        continue-on-error: true

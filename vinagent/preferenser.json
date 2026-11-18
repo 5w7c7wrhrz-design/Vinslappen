@@ -1,0 +1,19 @@
+{
+  "favoritdruvor": [
+    "Nebbiolo",
+    "Pinot Noir",
+    "Riesling",
+    "Syrah",
+    "Chardonnay"
+  ],
+  "favoritomraden": [
+    "Bourgogne",
+    "Piemonte",
+    "Rhône",
+    "Mosel"
+  ],
+  "favoritproducenter": [],
+  "maxpris": 800,
+  "minbetyg_kopforslag": 90,
+  "max_kopforslag_per_slapp": 6
+}
