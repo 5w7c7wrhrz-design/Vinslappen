@@ -38,9 +38,8 @@ def normalisera(p: dict) -> dict:
     namn = " ".join(x for x in [p.get("productNameBold"), p.get("productNameThin")] if x)
     bild = None
     if p.get("images"):
-        bild = p["images"][0].get("imageUrl")
-        if bild:
-            bild += "_400.png"
+        # Basadress; storlek och format läggs till i mallen, t.ex. "_100.webp"
+        bild = p["images"][0].get("imageUrl") or None
     return {
         "nr": p.get("productNumberShort") or "",
         "artikelnr": p.get("productNumber") or "",

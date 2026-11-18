@@ -16,7 +16,7 @@
   --bg: #f6f5f7; --yta: #ffffff; --linje: #e3dfe6; --fg: #1d1a21; --dov: #6b6573;
   --vin: #8a1c3c; --vin-svag: #f6e6ec; --grön: #2f6b4a; --grön-svag: #e3f1e8;
   --gul: #8a5a00; --gul-svag: #fbf0d9;
-  --rott: #8a1c3c; --vitt: #c9a227; --rose: #e48ba3; --bubbel: #b8b08a; --sott: #a55a1d; --ovrigt: #8c8494;
+  --rott: #8a1c3c; --vitt: #c9a227; --rose: #e48ba3; --bubbel: #b8b08a; --sott: #a55a1d; --ovrigt: #8c8494; --flaska: #eeebf0;
   --display: "Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
   --text: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   --siffror: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
@@ -26,12 +26,12 @@
   --bg: #141117; --yta: #1d1921; --linje: #322c38; --fg: #ece8f0; --dov: #a39cab;
   --vin: #f07b9c; --vin-svag: #3a1a26; --grön: #7fd3a3; --grön-svag: #16301f;
   --gul: #e9b860; --gul-svag: #33270f; --rott: #d9466e; --vitt: #e2c45a; --rose: #f2a7bb;
-  --bubbel: #d6cfa4; --sott: #d88a4a; --ovrigt: #a39cab; color-scheme: dark; } }
+  --bubbel: #d6cfa4; --sott: #d88a4a; --ovrigt: #a39cab; --flaska: #2a2530; color-scheme: dark; } }
 :root[data-theme="dark"] {
   --bg: #141117; --yta: #1d1921; --linje: #322c38; --fg: #ece8f0; --dov: #a39cab;
   --vin: #f07b9c; --vin-svag: #3a1a26; --grön: #7fd3a3; --grön-svag: #16301f;
   --gul: #e9b860; --gul-svag: #33270f; --rott: #d9466e; --vitt: #e2c45a; --rose: #f2a7bb;
-  --bubbel: #d6cfa4; --sott: #d88a4a; --ovrigt: #a39cab; color-scheme: dark; }
+  --bubbel: #d6cfa4; --sott: #d88a4a; --ovrigt: #a39cab; --flaska: #2a2530; color-scheme: dark; }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 var(--text); }
 .wrap { max-width: 860px; margin: 0 auto; padding-block: 28px 64px;
@@ -65,7 +65,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .kop { background: var(--yta); border: 1px solid var(--linje); border-radius: 14px; padding: 18px; margin-bottom: 36px; }
 .kop h2 { margin-bottom: 4px; }
 .kop ol { list-style: none; margin: 12px 0 0; padding: 0; display: grid; }
-.kop li { display: grid; grid-template-columns: 52px 1fr auto; gap: 12px; align-items: baseline; padding: 9px 0; border-top: 1px solid var(--linje); }
+.kop li { display: grid; grid-template-columns: 22px 44px 1fr auto; gap: 12px; align-items: baseline; padding: 9px 0; border-top: 1px solid var(--linje); }
 .kop li > div { min-width: 0; }
 .kop .p { font: 700 1.25rem/1 var(--siffror); color: var(--vin); }
 .kop .n { font-weight: 600; }
@@ -77,7 +77,7 @@ section.slapp { margin-bottom: 40px; }
 .slapp-huvud { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; margin-bottom: 8px; }
 .slapp-huvud .meta { color: var(--dov); font-size: 0.88rem; }
 .slapp.passerat .slapp-huvud h2 { color: var(--dov); }
-.vin { scroll-margin-top: 120px; display: grid; grid-template-columns: 64px 1fr; gap: 14px; padding: 14px 0; border-top: 1px solid var(--linje); }
+.vin { scroll-margin-top: 120px; display: grid; grid-template-columns: 34px 56px 1fr; gap: 14px; padding: 14px 0; border-top: 1px solid var(--linje); }
 .vin > div { min-width: 0; }
 .betyg { display: grid; justify-items: center; align-content: start; gap: 4px; padding-top: 2px; }
 .betyg b { font: 700 1.6rem/1 var(--siffror); font-variant-numeric: tabular-nums; color: var(--fg); }
@@ -96,6 +96,7 @@ section.slapp { margin-bottom: 40px; }
 .tagg.topp { background: var(--vin-svag); color: var(--vin); }
 .tagg.stil { background: var(--gul-svag); color: var(--gul); }
 details { margin-top: 8px; }
+.detalj { display: flow-root; }
 summary { cursor: pointer; color: var(--vin); font-size: 0.88rem; font-weight: 500; }
 .recension { margin: 10px 0 0; padding-left: 12px; border-left: 2px solid var(--linje); font-size: 0.9rem; white-space: pre-line; }
 .recension .vem { color: var(--dov); font-size: 0.8rem; white-space: normal; }
@@ -104,6 +105,16 @@ summary { cursor: pointer; color: var(--vin); font-size: 0.88rem; font-weight: 5
 .tomt { color: var(--dov); padding: 18px 0; }
 footer { color: var(--dov); font-size: 0.82rem; border-top: 1px solid var(--linje); padding-top: 16px; display: grid; gap: 6px; max-width: 70ch; }
 .dold { display: none !important; }
+.betyg .kort { display: none; }
+.flaska { display: flex; align-items: flex-end; justify-content: center; width: 34px; height: 116px; border-radius: 8px;
+  background: var(--flaska); padding: 4px 3px; overflow: hidden; align-self: start; }
+.flaska img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; display: block; }
+.flaska.tom::after { content: ""; width: 70%; height: 92%; background: var(--typ, var(--ovrigt)); opacity: 0.55;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 110'%3E%3Cpath d='M12 2h6v26c0 6 8 8 8 16v62a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V44c0-8 8-10 8-16z'/%3E%3C/svg%3E") center / contain no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 110'%3E%3Cpath d='M12 2h6v26c0 6 8 8 8 16v62a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V44c0-8 8-10 8-16z'/%3E%3C/svg%3E") center / contain no-repeat; }
+.kop .flaska { width: 22px; height: 64px; padding: 2px; border-radius: 5px; align-self: center; }
+.stor-flaska { float: right; margin: 8px 0 8px 14px; width: 84px; height: 300px; padding: 8px; border-radius: 12px; }
+@media (max-width: 520px) { .stor-flaska { width: 64px; height: 230px; } }
 .chip.instl { border-style: dashed; }
 .chip.instl[aria-expanded="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); border-style: solid; }
 .panel { background: var(--yta); border: 1px solid var(--linje); border-radius: 14px; padding: 18px; margin: -8px 0 28px; display: grid; gap: 16px; }
@@ -123,13 +134,22 @@ footer { color: var(--dov); font-size: 0.82rem; border-top: 1px solid var(--linj
 .status { color: var(--grön); font-size: 0.88rem; font-weight: 500; }
 #instl-json { width: 100%; font: 0.8rem var(--siffror); background: var(--bg); color: var(--fg); border: 1px solid var(--linje); border-radius: 8px; padding: 8px; }
 @media (max-width: 520px) {
-  .vin { grid-template-columns: 50px 1fr; gap: 10px; }
+  .vin { grid-template-columns: 28px 46px 1fr; gap: 10px; }
+  .vin .flaska { width: 28px; height: 96px; }
+  .betyg small { letter-spacing: 0.02em; }
+  .betyg .lang { display: none; }
+  .betyg .kort { display: inline; }
   .betyg b { font-size: 1.3rem; }
-  .kop li { grid-template-columns: 44px 1fr; }
-  .kop .d { grid-column: 2; text-align: left; }
+  .kop li { grid-template-columns: 22px 40px 1fr; }
+  .kop .d { grid-column: 3; text-align: left; }
 }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
 </style>
+{% macro flaska(v, storlek, klass="") -%}
+<span class="flaska {{ klass }}{% if not v.bild %} tom{% endif %}" style="--typ: var(--{{ typklass(v) }})" aria-hidden="true">
+{%- if v.bild %}<img src="{{ v.bild }}_{{ storlek }}.webp" alt="" loading="lazy" decoding="async" onerror="this.parentNode.classList.add('tom'); this.remove()">{% endif -%}
+</span>
+{%- endmacro %}
 {% if not fragment %}
 </head>
 <body>
@@ -207,6 +227,7 @@ footer { color: var(--dov); font-size: 0.82rem; border-top: 1px solid var(--linj
   <ol id="kop-lista">
     {% for v in kop %}
     <li data-datum="{{ v.lansering }}">
+      {{ flaska(v, 100) }}
       <span class="p">{{ v.betyg|poang }}</span>
       <div><div class="n"><a href="#v-{{ v.nr }}" data-hopp="{{ v.lansering }}">{{ v.namn }}</a></div>
         <div class="m">{{ v.pris|kr }}{% if v.land %} · {{ v.land }}{% endif %}{% if v.etiketter %} · {{ v.etiketter|join(", ") }}{% endif %}</div></div>
@@ -223,10 +244,11 @@ footer { color: var(--dov); font-size: 0.82rem; border-top: 1px solid var(--linj
     <span class="meta">{{ s.typer|join(" & ") }} · {{ s.viner|length }} viner · {{ s.provade }} provade{% if s.passerat %} · redan släppt{% elif s.dagar_kvar == 0 %} · i dag{% else %} · om {{ s.dagar_kvar }} {{ "dag" if s.dagar_kvar == 1 else "dagar" }}{% endif %}</span>
   </div>
   {% for v in s.viner %}
-  <article class="vin" id="v-{{ v.nr }}" data-typ="{{ typklass(v) }}" data-pris="{{ v.pris or 0 }}" data-kop="{{ 1 if v.kopforslag else 0 }}" data-provat="{{ 1 if v.betyg_kalla == 'finewines' else 0 }}" data-betyg="{{ v.betyg }}" data-prisvarde="{{ v.prisvarde }}" data-rank="{{ v.rank }}" data-datum="{{ v.lansering }}" data-datumtext="{{ svenskt_datum(v.lansering) }}" data-namn="{{ v.namn }}" data-land="{{ v.land }}" data-prisvisning="{{ v.pris|kr }}" data-poang="{{ v.betyg|poang }}" data-druvor="{{ v.druvor|join('|')|lower }}" data-plats="{{ (v.land ~ ' ' ~ v.region)|lower }}" data-prod="{{ (v.producent ~ ' ' ~ v.namn)|lower }}" data-fasta="{{ v.etiketter|reject('equalto', 'Din stil')|join(', ') }}">
+  <article class="vin" id="v-{{ v.nr }}" data-typ="{{ typklass(v) }}" data-pris="{{ v.pris or 0 }}" data-kop="{{ 1 if v.kopforslag else 0 }}" data-provat="{{ 1 if v.betyg_kalla == 'finewines' else 0 }}" data-betyg="{{ v.betyg }}" data-prisvarde="{{ v.prisvarde }}" data-rank="{{ v.rank }}" data-datum="{{ v.lansering }}" data-datumtext="{{ svenskt_datum(v.lansering) }}" data-namn="{{ v.namn }}" data-land="{{ v.land }}" data-prisvisning="{{ v.pris|kr }}" data-poang="{{ v.betyg|poang }}" data-druvor="{{ v.druvor|join('|')|lower }}" data-plats="{{ (v.land ~ ' ' ~ v.region)|lower }}" data-prod="{{ (v.producent ~ ' ' ~ v.namn)|lower }}" data-fasta="{{ v.etiketter|reject('equalto', 'Din stil')|join(', ') }}" data-bild="{{ v.bild or '' }}">
+    {{ flaska(v, 100) }}
     <div class="betyg {{ 'provat' if v.betyg_kalla == 'finewines' else 'gissat' }}">
       <b>{{ v.betyg|poang }}</b>
-      <small>{% if v.betyg_kalla == 'finewines' %}finewines{% if v.recensioner|selectattr("poang")|list|length > 1 %} ({{ v.recensioner|selectattr("poang")|list|length }}){% endif %}{% else %}uppskattat{% endif %}</small>
+      <small>{% if v.betyg_kalla == 'finewines' %}<span class="lang">finewines</span><span class="kort">forum</span>{% if v.recensioner|selectattr("poang")|list|length > 1 %} ({{ v.recensioner|selectattr("poang")|list|length }}){% endif %}{% else %}<span class="lang">uppskattat</span><span class="kort">gissat</span>{% endif %}</small>
     </div>
     <div>
       <div class="namnrad"><span class="prick" style="background: var(--{{ typklass(v) }})" title="{{ v.typ }}"></span><h3>{{ v.namn }}</h3></div>
@@ -248,11 +270,14 @@ footer { color: var(--dov); font-size: 0.82rem; border-top: 1px solid var(--linj
       </div>
       <details>
         <summary>{% if v.recensioner %}Läs {{ v.recensioner|length }} {{ "anteckning" if v.recensioner|length == 1 else "anteckningar" }} från finewines.se{% else %}Mer om vinet{% endif %}{% if v.omnamnanden %} · nämns i {{ v.omnamnanden }} svar{% endif %}</summary>
+        <div class="detalj">
+        {% if v.bild %}{{ flaska(v, 200, "stor-flaska") }}{% endif %}
         {% for r in v.recensioner %}
         <div class="recension"><div class="vem">{{ r.forfattare or "Forumet" }}{% if r.poang %} · {{ r.poang|poang }} p{% endif %} · <a href="{{ r.url }}" target="_blank" rel="noopener">inlägget</a></div>{{ r.text }}</div>
         {% endfor %}
         {% if v.smak %}<p class="sb-smak"><span class="etikett">Systembolaget</span><br>{{ v.smak }}{% if v.passar_till %} Passar till {{ v.passar_till|join(", ")|lower }}.{% endif %}</p>{% endif %}
         {% if not v.recensioner and not v.smak %}<p class="sb-smak">Ingen provning publicerad ännu.</p>{% endif %}
+        </div>
       </details>
       <div class="lankar">
         <a href="{{ v.url }}" target="_blank" rel="noopener">Systembolaget</a>
@@ -323,6 +348,7 @@ footer { color: var(--dov); font-size: 0.82rem; border-top: 1px solid var(--linj
     var ol = $("kop-lista"); ol.textContent = "";
     valda.forEach(function (a) {
       var d = a.dataset, li = document.createElement("li"); li.dataset.datum = d.datum;
+      var fl = a.querySelector(".flaska").cloneNode(true);
       var p = document.createElement("span"); p.className = "p"; p.textContent = d.poang;
       var mitt = document.createElement("div"), n = document.createElement("div"), l = document.createElement("a");
       n.className = "n"; l.href = "#" + a.id; l.dataset.hopp = d.datum; l.textContent = d.namn; n.appendChild(l);
@@ -330,7 +356,7 @@ footer { color: var(--dov); font-size: 0.82rem; border-top: 1px solid var(--linj
       m.textContent = [d.prisvisning, d.land, [d.fasta, d.stil].filter(Boolean).join(", ")].filter(Boolean).join(" · ");
       mitt.appendChild(n); mitt.appendChild(m);
       var dt = document.createElement("span"); dt.className = "d"; dt.textContent = d.datumtext;
-      li.appendChild(p); li.appendChild(mitt); li.appendChild(dt); ol.appendChild(li);
+      li.appendChild(fl); li.appendChild(p); li.appendChild(mitt); li.appendChild(dt); ol.appendChild(li);
     });
     $("antal-kop").textContent = valda.length;
     $("kop-regel").textContent = "Från " + min + " poäng, eller " + (min - 1) + " om fynd eller din stil" + (maxpris ? ", högst " + maxpris + " kr" : "");

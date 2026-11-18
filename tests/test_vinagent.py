@@ -108,6 +108,7 @@ def test_sla_ihop_kopplar_forum_och_lagger_till_forumviner():
     assert per_nr["90180"]["kalla"] == "systembolaget"
     assert per_nr["90180"]["flaskor"] == 600
     assert per_nr["90180"]["recensioner"][0]["poang"] == 91
+    assert per_nr["90180"]["bild"] == "https://product-cdn.systembolaget.se/productimages/1/1"
     assert per_nr["95631"]["kalla"] == "finewines"   # inte hos Systembolaget ännu
     assert per_nr["95631"]["volym_ml"] == 1500
     assert per_nr["95631"]["pris"] == 919
@@ -155,3 +156,6 @@ def test_bygg_sida():
     assert 'id="f-sort"' in html
     assert 'id="instl"' in html and '"minbetyg_kopforslag": 90' in html
     assert 'data-druva="Chenin Blanc"' in html
+    # flaskbild från Systembolaget, och tecknad flaska för forumviner utan bild
+    assert 'src="https://product-cdn.systembolaget.se/productimages/1/1_100.webp"' in html
+    assert 'class="flaska  tom"' in html

@@ -27,7 +27,8 @@ API-nycklar, bara GitHub Actions.
    ett fynd eller i din stil, inom ditt maxpris. Högst sex per släpp, de bästa först.
 6. **Webbsidan** visar köpförslagen överst och sedan varje släpp med alla viner, betyg,
    forumets anteckningar, Systembolagets smakbeskrivning och länkar till Systembolaget,
-   forumtråden och en Vivino-sökning. Du kan välja ett enskilt släppdatum, sortera på betyg,
+   forumtråden och en Vivino-sökning. Varje vin visas med Systembolagets flaskbild (en tecknad
+   flaska i vinets färg när bild saknas), och en större bild när man fäller ut vinet. Du kan välja ett enskilt släppdatum, sortera på betyg,
    prisvärde eller pris och filtrera på typ, maxpris och köpförslag. Ett valt datum hamnar i
    adressen (t.ex. `#d-2026-11-27`), så länken går att spara eller skicka vidare.
 
