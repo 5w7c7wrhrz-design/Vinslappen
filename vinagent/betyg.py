@@ -18,7 +18,7 @@ PRESTIGE = [
 ]
 
 MK_FYND = ("Fynd i sin prisklass", "Mer än prisvärt")
-MK_MIN = 16.5  # Munskänkarnas betyg (av 20) som räcker för köpförslag
+MK_MIN = 14.5  # Munskänkarnas betyg (av 20) som räcker för köpförslag
 
 BAS_POANG = 85.0
 BAS_PRIS = 150.0  # kr för 75 cl

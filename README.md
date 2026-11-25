@@ -32,7 +32,7 @@ API-nycklar, bara GitHub Actions.
    Munskänkarnas "Fynd i sin prisklass" och "Mer än prisvärt". Tycker forumet och Munskänkarna
    tydligt olika om betyg eller prisvärdhet visas en gul markering.
 6. **Köpförslag** är viner som forumet gett minst ditt minimibetyg (eller ett poäng under om de
-   är ett fynd eller i din stil), eller som Munskänkarna gett minst 16,5 av 20, inom ditt maxpris.
+   är ett fynd eller i din stil), eller som Munskänkarna gett minst 14,5 av 20, inom ditt maxpris.
    Högst sex per släpp, de bästa först.
 7. **Webbsidan** visar köpförslagen överst och sedan varje släpp med alla viner, betyg,
    forumets anteckningar, Systembolagets smakbeskrivning och länkar till Systembolaget,
@@ -79,7 +79,7 @@ dem då som utgångsläge. Fälten:
 | `maxpris` | Dyrare viner blir inte köpförslag (de syns ändå i listan). |
 | `minbetyg_kopforslag` | Lägsta forumbetyg för ett köpförslag. |
 | `max_kopforslag_per_slapp` | Hur många köpförslag per släppdatum som mest. |
-| `munskankarna_min` | Lägsta betyg av 20 hos Munskänkarna som ger köpförslag (16,5). |
+| `munskankarna_min` | Lägsta betyg av 20 hos Munskänkarna som ger köpförslag (14,5). |
 
 ## Installation
 

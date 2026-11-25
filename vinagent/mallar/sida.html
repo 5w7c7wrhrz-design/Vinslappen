@@ -65,9 +65,16 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .kop { background: var(--yta); border: 1px solid var(--linje); border-radius: 14px; padding: 18px; margin-bottom: 36px; }
 .kop h2 { margin-bottom: 4px; }
 .kop ol { list-style: none; margin: 12px 0 0; padding: 0; display: grid; }
-.kop li { display: grid; grid-template-columns: 22px 44px 1fr auto; gap: 12px; align-items: baseline; padding: 9px 0; border-top: 1px solid var(--linje); }
+.kop li { display: grid; grid-template-columns: 22px 64px 52px 1fr auto; gap: 12px; align-items: center; padding: 9px 0; border-top: 1px solid var(--linje); }
 .kop li > div { min-width: 0; }
-.kop .p { font: 700 1.25rem/1 var(--siffror); color: var(--vin); }
+.kop .p { font: 700 1.25rem/1 var(--siffror); color: var(--vin); display: grid; justify-items: center; gap: 4px; }
+.kop .p.tom { color: var(--dov); font-weight: 500; }
+.kop .p small { font: 600 0.6rem/1 var(--text); letter-spacing: 0.06em; text-transform: uppercase; color: var(--dov); }
+.kop .p .kort { display: none; }
+.kop .mkbetyg { min-width: 0; }
+.kop .mkplats { min-height: 1px; }
+.kop .m .mkpv { color: var(--mk); }
+.kop .m .mkpv.bra { color: var(--grön); }
 .kop .n { font-weight: 600; }
 .kop .m { color: var(--dov); font-size: 0.85rem; }
 .kop .d { font: 500 0.82rem var(--siffror); color: var(--dov); text-align: right; white-space: nowrap; }
@@ -217,8 +224,14 @@ body.har-korg .wrap { padding-bottom: 110px; }
   .betyg .lang { display: none; }
   .betyg .kort { display: inline; }
   .betyg b { font-size: 1.3rem; }
-  .kop li { grid-template-columns: 22px 40px 1fr; }
-  .kop .d { grid-column: 3; text-align: left; }
+  .kop li { grid-template-columns: 22px 50px 1fr; align-items: start; row-gap: 6px; }
+  .kop li > .flaska { grid-row: 1 / 4; }
+  .kop li > .p { grid-column: 2; grid-row: 1; }
+  .kop li > .mkplats { grid-column: 2; grid-row: 2; justify-self: center; }
+  .kop li > div:not(.mkplats) { grid-column: 3; grid-row: 1 / 3; }
+  .kop .d { grid-column: 3; grid-row: 3; text-align: left; }
+  .kop .p .lang { display: none; }
+  .kop .p .kort { display: inline; }
 }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
 </style>
@@ -311,9 +324,10 @@ body.har-korg .wrap { padding-bottom: 110px; }
     {% for v in kop %}
     <li data-datum="{{ v.lansering }}">
       {{ flaska(v, 100) }}
-      <span class="p">{{ v.betyg|poang }}</span>
+      <span class="p{% if v.betyg_kalla != 'finewines' %} tom{% endif %}">{{ v.betyg|poang if v.betyg_kalla == 'finewines' else '–' }}<small><span class="lang">finewines</span><span class="kort">forum</span></small></span>
+      <span class="mkplats">{% if v.munskankarna %}<span class="mkbetyg"><b>{{ v.munskankarna.betyg|poang }}</b><small>/20 MK</small></span>{% endif %}</span>
       <div><div class="n"><a href="#v-{{ v.nr }}" data-hopp="{{ v.lansering }}">{{ v.namn }}</a></div>
-        <div class="m">{{ v.pris|kr }}{% if v.land %} · {{ v.land }}{% endif %}{% if v.etiketter %} · {{ v.etiketter|join(", ") }}{% endif %}</div></div>
+        <div class="m">{{ v.pris|kr }}{% if v.land %} · {{ v.land }}{% endif %}{% if v.etiketter %} · {{ v.etiketter|join(", ") }}{% endif %}{% if v.munskankarna and v.munskankarna.prisvarde %} · <span class="mkpv{% if v.munskankarna.prisvarde in ('Fynd i sin prisklass', 'Mer än prisvärt') %} bra{% endif %}">MK: {{ v.munskankarna.prisvarde }}</span>{% endif %}</div></div>
       <span class="d">{{ svenskt_datum(v.lansering) }}</span>
     </li>
     {% endfor %}
@@ -327,7 +341,7 @@ body.har-korg .wrap { padding-bottom: 110px; }
     <span class="meta">{{ s.typer|join(" & ") }} · {{ s.viner|length }} viner · {{ s.provade }} på forumet{% if s.mk %} · {{ s.mk }} av Munskänkarna{% endif %}{% if s.passerat %} · redan släppt{% elif s.dagar_kvar == 0 %} · i dag{% else %} · om {{ s.dagar_kvar }} {{ "dag" if s.dagar_kvar == 1 else "dagar" }}{% endif %}</span>
   </div>
   {% for v in s.viner %}
-  <article class="vin" id="v-{{ v.nr }}" data-typ="{{ typklass(v) }}" data-pris="{{ v.pris or 0 }}" data-kop="{{ 1 if v.kopforslag else 0 }}" data-provat="{{ 1 if v.betyg_kalla == 'finewines' else 0 }}" data-betyg="{{ v.betyg }}" data-prisvarde="{{ v.prisvarde }}" data-rank="{{ v.rank }}" data-datum="{{ v.lansering }}" data-datumtext="{{ svenskt_datum(v.lansering) }}" data-namn="{{ v.namn }}" data-land="{{ v.land }}" data-prisvisning="{{ v.pris|kr }}" data-poang="{{ v.betyg|poang }}" data-druvor="{{ v.druvor|join('|')|lower }}" data-plats="{{ (v.land ~ ' ' ~ v.region)|lower }}" data-prod="{{ (v.producent ~ ' ' ~ v.namn)|lower }}" data-fasta="{{ v.etiketter|reject('equalto', 'Din stil')|join(', ') }}" data-bild="{{ v.bild or '' }}" data-nr="{{ v.nr }}" data-url="{{ v.url }}" data-flaskor="{{ v.flaskor or '' }}" data-tid="{{ v.saljstart_tid or '10:00' }}" data-sortiment="{{ v.sortiment }}" data-mk="{{ v.munskankarna.betyg if v.munskankarna else '' }}" data-mkfynd="{{ 1 if v.munskankarna and v.munskankarna.prisvarde in ('Fynd i sin prisklass', 'Mer än prisvärt') else 0 }}">
+  <article class="vin" id="v-{{ v.nr }}" data-typ="{{ typklass(v) }}" data-pris="{{ v.pris or 0 }}" data-kop="{{ 1 if v.kopforslag else 0 }}" data-provat="{{ 1 if v.betyg_kalla == 'finewines' else 0 }}" data-betyg="{{ v.betyg }}" data-prisvarde="{{ v.prisvarde }}" data-rank="{{ v.rank }}" data-datum="{{ v.lansering }}" data-datumtext="{{ svenskt_datum(v.lansering) }}" data-namn="{{ v.namn }}" data-land="{{ v.land }}" data-prisvisning="{{ v.pris|kr }}" data-poang="{{ v.betyg|poang }}" data-druvor="{{ v.druvor|join('|')|lower }}" data-plats="{{ (v.land ~ ' ' ~ v.region)|lower }}" data-prod="{{ (v.producent ~ ' ' ~ v.namn)|lower }}" data-fasta="{{ v.etiketter|reject('equalto', 'Din stil')|join(', ') }}" data-bild="{{ v.bild or '' }}" data-nr="{{ v.nr }}" data-url="{{ v.url }}" data-flaskor="{{ v.flaskor or '' }}" data-tid="{{ v.saljstart_tid or '10:00' }}" data-sortiment="{{ v.sortiment }}" data-mk="{{ v.munskankarna.betyg if v.munskankarna else '' }}" data-mkpv="{{ v.munskankarna.prisvarde if v.munskankarna and v.munskankarna.prisvarde else '' }}" data-mkfynd="{{ 1 if v.munskankarna and v.munskankarna.prisvarde in ('Fynd i sin prisklass', 'Mer än prisvärt') else 0 }}">
     {{ flaska(v, 100) }}
     {% set mk = v.munskankarna %}
     <div class="betyg {{ 'provat' if v.betyg_kalla == 'finewines' else 'gissat' }}{% if mk and v.betyg_kalla != 'finewines' %} bara-mk{% endif %}">
@@ -393,7 +407,7 @@ body.har-korg .wrap { padding-bottom: 110px; }
 <footer>
   <span>Uppdaterad {{ uppdaterad }}. Källor: systembolaget.se och forumet <a href="https://www.finewines.se/forums/lanseringar-fran-systembolaget.51/" target="_blank" rel="noopener">Lanseringar från Systembolaget</a> på finewines.se.</span>
   <span>Uppskattade betyg bygger på pris, område, ålder och hur mycket vinet diskuteras. De är en gissning och blir aldrig köpförslag på egen hand. Prisvärde visar hur många poäng över eller under det vanliga för prisklassen vinet ligger.</span>
-  <span><b style="color:var(--mk)">Munskänkarna</b> (blå ruta) betygsätter på 20-poängsskala: 18–20 exceptionellt, 15–17,5 högklassigt, 12–14,5 bra till mycket bra. Prisvärdhet: Fynd i sin prisklass, Mer än prisvärt, Prisvärt, Ej prisvärt. Deras fynd räknas som Fynd här, och viner med minst ditt lägsta Munskänkarna-betyg blir köpförslag. Källa: <a href="https://www.munskankarna.se/sv/vinlocus/" target="_blank" rel="noopener">Munskänkarnas Vinlocus</a>.</span>
+  <span><b style="color:var(--mk)">Munskänkarna</b> (blå ruta) betygsätter på 20-poängsskala: 18–20 exceptionellt, 15–17,5 högklassigt, 12–14,5 bra till mycket bra. Prisvärdhet: Fynd i sin prisklass, Mer än prisvärt, Prisvärt, Ej prisvärt. Deras fynd räknas som Fynd här, och viner med minst ditt lägsta Munskänkarna-betyg (14,5 från början) blir köpförslag. Källa: <a href="https://www.munskankarna.se/sv/vinlocus/" target="_blank" rel="noopener">Munskänkarnas Vinlocus</a>.</span>
 </footer>
 </div>
 
@@ -467,7 +481,7 @@ body.har-korg .wrap { padding-bottom: 110px; }
     var perDatum = {};
     document.querySelectorAll("article.vin").forEach(function (a) {
       var d = a.dataset, t = traffar(a), provat = d.provat === "1", betyg = +d.betyg, pv = +d.prisvarde;
-      var mk = d.mk ? +d.mk : 0, mkFynd = d.mkfynd === "1", mkMin = +pref.munskankarna_min || 16.5;
+      var mk = d.mk ? +d.mk : 0, mkFynd = d.mkfynd === "1", mkMin = +pref.munskankarna_min || 14.5;
       var kopForum = provat && (betyg >= min || (betyg >= min - 1 && (pv >= 3 || t.length > 0)));
       var kop = (kopForum || (mk && mk >= mkMin)) && !(maxpris && +d.pris > maxpris);
       var grund = provat ? betyg + 0.3 * pv : (mk ? 85 + (mk - 14) * 2.5 : betyg + 0.3 * pv - 3);
@@ -491,17 +505,33 @@ body.har-korg .wrap { padding-bottom: 110px; }
     valda.forEach(function (a) {
       var d = a.dataset, li = document.createElement("li"); li.dataset.datum = d.datum;
       var fl = a.querySelector(".flaska").cloneNode(true);
-      var p = document.createElement("span"); p.className = "p"; p.textContent = d.poang;
+      var p = document.createElement("span"), forum = d.provat === "1";
+      p.className = "p" + (forum ? "" : " tom"); p.textContent = forum ? d.poang : "–";
+      var kalla = document.createElement("small"), l1 = document.createElement("span"), l2 = document.createElement("span");
+      l1.className = "lang"; l1.textContent = "finewines"; l2.className = "kort"; l2.textContent = "forum";
+      kalla.appendChild(l1); kalla.appendChild(l2); p.appendChild(kalla);
+      var mkplats = document.createElement("span"); mkplats.className = "mkplats";
+      if (d.mk) {
+        var mb = document.createElement("span"), mbb = document.createElement("b"), mbs = document.createElement("small");
+        mb.className = "mkbetyg"; mbb.textContent = String(+d.mk).replace(".", ","); mbs.textContent = "/20 MK";
+        mb.appendChild(mbb); mb.appendChild(mbs); mkplats.appendChild(mb);
+      }
       var mitt = document.createElement("div"), n = document.createElement("div"), l = document.createElement("a");
       n.className = "n"; l.href = "#" + a.id; l.dataset.hopp = d.datum; l.textContent = d.namn; n.appendChild(l);
       var m = document.createElement("div"); m.className = "m";
       m.textContent = [d.prisvisning, d.land, [d.fasta, d.stil].filter(Boolean).join(", ")].filter(Boolean).join(" · ");
+      if (d.mkpv) {
+        var pvs = document.createElement("span");
+        pvs.className = "mkpv" + (d.mkfynd === "1" ? " bra" : ""); pvs.textContent = "MK: " + d.mkpv;
+        m.appendChild(document.createTextNode(" · ")); m.appendChild(pvs);
+      }
       mitt.appendChild(n); mitt.appendChild(m);
       var dt = document.createElement("span"); dt.className = "d"; dt.textContent = d.datumtext;
-      li.appendChild(fl); li.appendChild(p); li.appendChild(mitt); li.appendChild(dt); ol.appendChild(li);
+      li.appendChild(fl); li.appendChild(p); li.appendChild(mkplats); li.appendChild(mitt); li.appendChild(dt); ol.appendChild(li);
     });
     $("antal-kop").textContent = valda.length;
-    $("kop-regel").textContent = "Från " + min + " poäng, eller " + (min - 1) + " om fynd eller din stil" + (maxpris ? ", högst " + maxpris + " kr" : "");
+    var mkGrans = String(+pref.munskankarna_min || 14.5).replace(".", ",");
+    $("kop-regel").textContent = "Från " + min + " poäng (" + (min - 1) + " om fynd eller din stil) eller minst " + mkGrans + "/20 hos Munskänkarna" + (maxpris ? " · högst " + maxpris + " kr" : "");
     return valda.length;
   }
 
@@ -512,7 +542,7 @@ body.har-korg .wrap { padding-bottom: 110px; }
     $("p-maxpris").value = pref.maxpris || "";
     $("p-minbetyg").value = pref.minbetyg_kopforslag || 89;
     $("p-perslapp").value = pref.max_kopforslag_per_slapp || 6;
-    $("p-mkmin").value = pref.munskankarna_min || 16.5;
+    $("p-mkmin").value = pref.munskankarna_min || 14.5;
     var valdaDruvor = lista(pref.favoritdruvor).map(function (x) { return x.toLowerCase(); });
     document.querySelectorAll("#p-druvforslag button").forEach(function (b) { b.setAttribute("aria-pressed", valdaDruvor.indexOf(b.dataset.druva.toLowerCase()) >= 0); });
   }
@@ -523,7 +553,7 @@ body.har-korg .wrap { padding-bottom: 110px; }
       favoritproducenter: delad($("p-producenter").value), maxpris: +$("p-maxpris").value || 0,
       minbetyg_kopforslag: Math.min(100, Math.max(70, +$("p-minbetyg").value || 89)),
       max_kopforslag_per_slapp: Math.max(1, +$("p-perslapp").value || 6),
-      munskankarna_min: Math.min(20, Math.max(10, +String($("p-mkmin").value).replace(",", ".") || 16.5))
+      munskankarna_min: Math.min(20, Math.max(10, +String($("p-mkmin").value).replace(",", ".") || 14.5))
     };
   }
   var statusTimer;
