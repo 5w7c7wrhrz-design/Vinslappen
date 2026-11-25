@@ -159,3 +159,87 @@ def test_bygg_sida():
     # flaskbild från Systembolaget, och tecknad flaska för forumviner utan bild
     assert 'src="https://product-cdn.systembolaget.se/productimages/1/1_100.webp"' in html
     assert 'class="flaska  tom"' in html
+
+
+# ---------------- Munskänkarna ----------------
+from vinagent import munskankarna
+from vinagent.main import koppla_munskankarna
+
+MK_SIDA = """<ul>
+<li class="medium-3 groupedlist"><div class="c-wine-info"><div class="c-wine-info__left">
+ <div class="c-wine-bottle__greybox"><h4>BETYG</h4><div class="wine-points text-center">17,5</div>
+ <div class="c-wine-info__price text-center">319:-</div></div>
+ <div class="c-wine-info__stats"><div class="c-wine-info__stat" name="category"><img src="/ws_2.svg"/><span>Mer än prisvärt</span></div></div>
+ <div class="c-wine-info__typical text-center mt-20"><img src="/typical_bl.svg"/><p>Druv- eller distrikttypisk</p></div></div>
+ <div class="c-wine-info__content"><h3><a href="/sv/vinlocus/tillfalligt-sortiment-27-november-2026/chateau-coutet-2022">Chateau Coutet Premier Cru 2022</a></h3>
+ Producent: Chateau Coutet Systembolaget: 9547602 Stor doft av aprikos och honung. 612 fl. Druvor: 94% semillon</div></div></li>
+<li class="medium-3 groupedlist"><div class="c-wine-info"><div class="wine-points">16,5</div>
+ <div class="c-wine-info__stat"><span>Ej prisvärt</span></div>
+ <h3><a href="/sv/vinlocus/tillfalligt-sortiment-27-november-2026/barolo">Barolo Bricco delle Viole 2022</a></h3>
+ Systembolaget: 9490101 Finstämd doft av hallon. 900 fl.</div></li>
+<li class="medium-3 groupedlist"><div class="wine-points">15</div> Utan artikelnummer</li>
+</ul>"""
+
+
+def test_tolka_provning():
+    p = munskankarna.tolka_provning("https://www.munskankarna.se/sv/vinlocus/tillfalligt-sortiment-27-november-2026")
+    assert p["typ"] == "tillfalligt-sortiment" and p["start"] == date(2026, 11, 27) and not p["hel_manad"]
+    assert munskankarna.tolka_provning("https://x/sv/vinlocus/hitlista-26-november-2026")["typ"] == "hitlista"
+    assert munskankarna.tolka_provning("https://x/sv/vinlocus/webbviner-december-2026") is None
+    assert munskankarna.tolka_provning("https://x/sv/vinlocus/temaprovning-champagne-2026") is None
+
+
+def test_tolka_munskankarnas_lista():
+    mk = munskankarna.tolka_lista(MK_SIDA, "https://x/prov")
+    assert set(mk) == {"9547602", "9490101"}
+    c = mk["9547602"]
+    assert c["betyg"] == 17.5 and c["prisvarde"] == "Mer än prisvärt" and c["typisk"]
+    assert c["text"].startswith("Stor doft av aprikos") and "Druvor" not in c["text"]
+    assert c["url"] == "https://www.munskankarna.se/sv/vinlocus/tillfalligt-sortiment-27-november-2026/chateau-coutet-2022"
+    assert mk["9490101"]["prisvarde"] == "Ej prisvärt" and not mk["9490101"]["typisk"]
+
+
+def _vin(nr, artikelnr, pris, forum=None):
+    return {"nr": nr, "artikelnr": artikelnr, "namn": "Vin " + nr, "pris": pris, "volym_ml": 750,
+            "lansering": "2026-11-27", "druvor": [], "land": "", "region": "", "typ": "Rött vin",
+            "argang": "2022", "omnamnanden": 0,
+            "recensioner": [{"poang": forum, "text": "", "forfattare": "P", "url": ""}] if forum else []}
+
+
+def test_munskankarna_paverkar_kopforslag_och_fynd():
+    mk = munskankarna.tolka_lista(MK_SIDA)
+    viner = [_vin("95476", "9547602", 319),            # bara Munskänkarna, 17,5 och mer än prisvärt
+             _vin("94901", "9490101", 629, forum=93),  # forumet 93, Munskänkarna ej prisvärt
+             _vin("95631", "", 919, forum=86)]         # bara i forumet, inget MK
+    koppla_munskankarna(viner, mk)
+    pref = {"minbetyg_kopforslag": 90, "maxpris": 800, "munskankarna_min": 16.5}
+    b = {v["nr"]: betyg.bedom(v, pref, date(2026, 11, 20)) for v in viner}
+    assert b["95476"]["kopforslag"] and "Fynd" in b["95476"]["etiketter"]
+    assert b["95476"]["betyg_kalla"] == "uppskattning"     # ingen forumpoäng att visa
+    assert b["94901"]["kopforslag"]
+    assert b["95631"]["munskankarna"] is None and not b["95631"]["kopforslag"]
+    # för högt minimibetyg eller för dyrt stoppar Munskänkarnas köpförslag
+    assert not betyg.bedom(dict(viner[0]), pref | {"munskankarna_min": 18}, date(2026, 11, 20))["kopforslag"]
+    assert not betyg.bedom(dict(viner[0]), pref | {"maxpris": 300}, date(2026, 11, 20))["kopforslag"]
+
+
+def test_forumvin_utan_artikelnummer_matchar_pa_fem_siffror():
+    viner = [_vin("94901", "", 629, forum=93)]
+    koppla_munskankarna(viner, munskankarna.tolka_lista(MK_SIDA))
+    assert viner[0]["munskankarna"]["betyg"] == 16.5
+
+
+def test_oense_och_sidan_visar_munskankarna():
+    from datetime import datetime
+    mk = munskankarna.tolka_lista(MK_SIDA)
+    v = _vin("94901", "9490101", 629, forum=93)
+    v["recensioner"][0]["poang"] = 95   # forumet: klart fynd, Munskänkarna: ej prisvärt
+    koppla_munskankarna([v], mk)
+    v = betyg.bedom(v, {"minbetyg_kopforslag": 90}, date(2026, 11, 20))
+    assert v["oense"]
+    v.update(bild=None, url="u", sortiment="Tillfälligt sortiment", smak="", passar_till=[], trad=None,
+             preferenstraffar=v["preferenstraffar"], stil="", flaskor=900, producent="")
+    html = bygg_sida([v], date(2026, 11, 20), datetime(2026, 11, 20, 8), {})
+    assert "16,5" in html and "/20 MK" in html and "MK: Ej prisvärt" in html
+    assert "Forumet och Munskänkarna tycker olika" in html
+    assert "Finstämd doft av hallon" in html and 'id="f-mk"' in html

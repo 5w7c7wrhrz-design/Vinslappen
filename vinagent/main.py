@@ -8,7 +8,7 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-from . import betyg, finewines, systembolaget
+from . import betyg, finewines, munskankarna, systembolaget
 from .browser import browser
 from .sida import bygg_sida
 
@@ -26,6 +26,16 @@ def las_preferenser(sokvag: Path) -> dict:
 
 def sok_url_sb(nr: str) -> str:
     return f"https://www.systembolaget.se/sok/?textQuery={nr}"
+
+
+def koppla_munskankarna(viner: list[dict], mk: dict[str, dict]) -> None:
+    """Munskänkarnas betyg via Systembolagets artikelnummer (sju siffror, eller de fem
+    första för viner som bara finns i forumet än)."""
+    kort = {}
+    for nr, data in mk.items():
+        kort.setdefault(nr[:5], data)
+    for v in viner:
+        v["munskankarna"] = mk.get(v.get("artikelnr") or "") or (None if v.get("artikelnr") else kort.get(v["nr"]))
 
 
 def slå_ihop(sb_viner: list[dict], anteckningar: dict[str, dict], fran: date, till: date) -> list[dict]:
@@ -74,7 +84,15 @@ def kor(dagar_fram: int, dagar_bak: int, ut: Path, pref_fil: Path) -> list[dict]
             log.exception("Kunde inte läsa finewines.se, fortsätter utan anteckningar")
             anteckningar = {}
         log.info("Finewines: anteckningar om %s artikelnummer", len(anteckningar))
-    viner = [betyg.bedom(v, pref, idag) for v in slå_ihop(sb, anteckningar, fran, till)]
+        try:
+            mk = munskankarna.hamta(ctx, fran, till)
+        except Exception:  # Munskänkarna nere ska inte stoppa listan
+            log.exception("Kunde inte läsa Munskänkarna, fortsätter utan deras betyg")
+            mk = {}
+        log.info("Munskänkarna: betyg på %s viner", len(mk))
+    alla = slå_ihop(sb, anteckningar, fran, till)
+    koppla_munskankarna(alla, mk)
+    viner = [betyg.bedom(v, pref, idag) for v in alla]
     betyg.begransa_kopforslag(viner, pref.get("max_kopforslag_per_slapp", 6))
     ut.mkdir(parents=True, exist_ok=True)
     (ut / "viner.json").write_text(json.dumps(viner, ensure_ascii=False, indent=1), encoding="utf-8")

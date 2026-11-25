@@ -58,6 +58,7 @@ def bygg_sida(viner: list[dict], idag: date, nu: datetime, pref: dict, fragment:
             "passerat": dd < idag, "dagar_kvar": (dd - idag).days,
             "provade": sum(v["betyg_kalla"] == "finewines" for v in lista),
             "kop": sum(v["kopforslag"] for v in lista),
+            "mk": sum(1 for v in lista if v.get("munskankarna")),
         })
     kop = sorted([v for v in viner if v["kopforslag"] and v["lansering"] >= idag.isoformat()],
                  key=lambda v: (v["lansering"], -v["rank"]))
@@ -76,6 +77,7 @@ def bygg_sida(viner: list[dict], idag: date, nu: datetime, pref: dict, fragment:
     return env.get_template("sida.html").render(
         slapp=slapp, kop=kop, kommande=kommande, antal=len(viner), pref=pref, typer=typer,
         provade=sum(v["betyg_kalla"] == "finewines" for v in viner),
+        mk_antal=sum(1 for v in viner if v.get("munskankarna")),
         vanliga_druvor=vanliga_druvor, idag=idag.isoformat(),
         uppdaterad=f"{nu.day} {MANADER[nu.month - 1]} {nu:%H:%M}", fragment=fragment,
         svenskt_datum=lambda s: svenskt_datum(date.fromisoformat(s)),

@@ -15,7 +15,7 @@
 :root {
   --bg: #f6f5f7; --yta: #ffffff; --linje: #e3dfe6; --fg: #1d1a21; --dov: #6b6573;
   --vin: #8a1c3c; --vin-svag: #f6e6ec; --grön: #2f6b4a; --grön-svag: #e3f1e8;
-  --gul: #8a5a00; --gul-svag: #fbf0d9;
+  --gul: #8a5a00; --gul-svag: #fbf0d9; --mk: #1f4e79; --mk-svag: #e4edf6;
   --rott: #8a1c3c; --vitt: #c9a227; --rose: #e48ba3; --bubbel: #b8b08a; --sott: #a55a1d; --ovrigt: #8c8494; --flaska: #eeebf0;
   --display: "Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
   --text: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -25,12 +25,12 @@
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --bg: #141117; --yta: #1d1921; --linje: #322c38; --fg: #ece8f0; --dov: #a39cab;
   --vin: #f07b9c; --vin-svag: #3a1a26; --grön: #7fd3a3; --grön-svag: #16301f;
-  --gul: #e9b860; --gul-svag: #33270f; --rott: #d9466e; --vitt: #e2c45a; --rose: #f2a7bb;
+  --gul: #e9b860; --gul-svag: #33270f; --mk: #9cc3ea; --mk-svag: #1a2836; --rott: #d9466e; --vitt: #e2c45a; --rose: #f2a7bb;
   --bubbel: #d6cfa4; --sott: #d88a4a; --ovrigt: #a39cab; --flaska: #2a2530; color-scheme: dark; } }
 :root[data-theme="dark"] {
   --bg: #141117; --yta: #1d1921; --linje: #322c38; --fg: #ece8f0; --dov: #a39cab;
   --vin: #f07b9c; --vin-svag: #3a1a26; --grön: #7fd3a3; --grön-svag: #16301f;
-  --gul: #e9b860; --gul-svag: #33270f; --rott: #d9466e; --vitt: #e2c45a; --rose: #f2a7bb;
+  --gul: #e9b860; --gul-svag: #33270f; --mk: #9cc3ea; --mk-svag: #1a2836; --rott: #d9466e; --vitt: #e2c45a; --rose: #f2a7bb;
   --bubbel: #d6cfa4; --sott: #d88a4a; --ovrigt: #a39cab; --flaska: #2a2530; color-scheme: dark; }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 var(--text); }
@@ -79,7 +79,7 @@ section.slapp { margin-bottom: 40px; }
 .slapp.passerat .slapp-huvud h2 { color: var(--dov); }
 .vin { scroll-margin-top: 120px; display: grid; grid-template-columns: 34px 56px 1fr 40px; gap: 14px; padding: 14px 0; border-top: 1px solid var(--linje); }
 .vin > div { min-width: 0; }
-.betyg { display: grid; justify-items: center; align-content: start; gap: 4px; padding-top: 2px; }
+.betyg { display: grid; justify-items: center; align-content: start; gap: 6px; padding-top: 2px; }
 .betyg b { font: 700 1.6rem/1 var(--siffror); font-variant-numeric: tabular-nums; color: var(--fg); }
 .betyg.provat b { color: var(--vin); }
 .betyg.gissat b { color: var(--dov); font-weight: 500; font-size: 1.3rem; }
@@ -105,6 +105,17 @@ summary { cursor: pointer; color: var(--vin); font-size: 0.88rem; font-weight: 5
 .tomt { color: var(--dov); padding: 18px 0; }
 footer { color: var(--dov); font-size: 0.82rem; border-top: 1px solid var(--linje); padding-top: 16px; display: grid; gap: 6px; max-width: 70ch; }
 .dold { display: none !important; }
+.mkbetyg { display: grid; justify-items: center; background: var(--mk-svag); color: var(--mk); border-radius: 7px; padding: 4px 6px 3px; min-width: 48px; }
+.mkbetyg b { font: 700 1rem/1 var(--siffror); color: var(--mk); }
+.mkbetyg small { font-size: 0.6rem; color: var(--mk); letter-spacing: 0.04em; }
+.betyg.bara-mk .mkbetyg b { font-size: 1.3rem; }
+.tagg.mk-bra { background: var(--grön-svag); color: var(--grön); }
+.tagg.mk-fynd { background: var(--grön); color: var(--yta); }
+.tagg.mk-ej { background: var(--linje); color: var(--dov); }
+.oense { display: inline-block; margin-top: 7px; font-size: 0.8rem; color: var(--gul); background: var(--gul-svag); border-radius: 6px; padding: 3px 8px; }
+.recension.mk { border-left-color: var(--mk); background: var(--mk-svag); border-radius: 0 8px 8px 0; padding: 8px 10px; white-space: normal; }
+.recension.mk .vem, .recension.mk a { color: var(--mk); }
+.lankar a.mk { color: var(--mk); }
 /* varukorg */
 .valj { width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--linje); background: var(--yta); color: var(--dov);
   display: grid; place-items: center; cursor: pointer; align-self: start; padding: 0; }
@@ -229,6 +240,7 @@ body.har-korg .wrap { padding-bottom: 110px; }
   <div class="siffror">
     <div><span class="etikett">Viner</span><b>{{ antal }}</b></div>
     <div><span class="etikett">Provade på forumet</span><b>{{ provade }}</b></div>
+    <div><span class="etikett">Munskänkarna</span><b>{{ mk_antal }}</b></div>
     <div><span class="etikett">Köpförslag</span><b id="antal-kop">{{ kop|length }}</b></div>
     {% if kommande %}<div><span class="etikett">Nästa släpp</span><b>{{ kommande.datum[5:] }}</b></div>{% endif %}
   </div>
@@ -245,9 +257,11 @@ body.har-korg .wrap { padding-bottom: 110px; }
     <option value="prisvarde">Prisvärde</option>
     <option value="pris-upp">Pris, lägst först</option>
     <option value="pris-ned">Pris, högst först</option>
+    <option value="mk">Munskänkarnas betyg</option>
   </select></label>
   <button class="chip" type="button" id="f-kop" aria-pressed="false">Bara köpförslag</button>
   <button class="chip" type="button" id="f-provat" aria-pressed="false">Bara provade</button>
+  <button class="chip" type="button" id="f-mk" aria-pressed="false">Provade av Munskänkarna</button>
   {% for t in typer %}
   <button class="chip typ" type="button" id="f-typ-{{ t }}" data-typ="{{ t }}" aria-pressed="false"><span class="prick" style="background: var(--{{ t }})"></span>{{ {"rott":"Rött","vitt":"Vitt","rose":"Rosé","bubbel":"Mousserande","sott":"Sött & starkt","ovrigt":"Övrigt"}[t] }}</button>
   {% endfor %}
@@ -277,6 +291,7 @@ body.har-korg .wrap { padding-bottom: 110px; }
   <div class="tal">
     <div class="falt"><label for="p-maxpris">Maxpris för köpförslag</label><input id="p-maxpris" type="number" inputmode="numeric" min="0" step="50" placeholder="ingen gräns"><small>kronor per flaska</small></div>
     <div class="falt"><label for="p-minbetyg">Lägsta betyg</label><input id="p-minbetyg" type="number" inputmode="numeric" min="80" max="100" step="1"><small>forumpoäng (100-skala)</small></div>
+    <div class="falt"><label for="p-mkmin">Munskänkarna, lägsta betyg</label><input id="p-mkmin" type="number" inputmode="decimal" min="10" max="20" step="0.5"><small>av 20, ger köpförslag</small></div>
     <div class="falt"><label for="p-perslapp">Köpförslag per släpp</label><input id="p-perslapp" type="number" inputmode="numeric" min="1" max="50" step="1"><small>högst så här många</small></div>
   </div>
   <div class="knappar">
@@ -309,14 +324,18 @@ body.har-korg .wrap { padding-bottom: 110px; }
 <section class="slapp{% if s.passerat %} passerat{% endif %}" id="d-{{ s.datum }}" aria-labelledby="h-{{ s.datum }}">
   <div class="slapp-huvud">
     <h2 id="h-{{ s.datum }}">{{ s.rubrik|capitalize }}</h2>
-    <span class="meta">{{ s.typer|join(" & ") }} · {{ s.viner|length }} viner · {{ s.provade }} provade{% if s.passerat %} · redan släppt{% elif s.dagar_kvar == 0 %} · i dag{% else %} · om {{ s.dagar_kvar }} {{ "dag" if s.dagar_kvar == 1 else "dagar" }}{% endif %}</span>
+    <span class="meta">{{ s.typer|join(" & ") }} · {{ s.viner|length }} viner · {{ s.provade }} på forumet{% if s.mk %} · {{ s.mk }} av Munskänkarna{% endif %}{% if s.passerat %} · redan släppt{% elif s.dagar_kvar == 0 %} · i dag{% else %} · om {{ s.dagar_kvar }} {{ "dag" if s.dagar_kvar == 1 else "dagar" }}{% endif %}</span>
   </div>
   {% for v in s.viner %}
-  <article class="vin" id="v-{{ v.nr }}" data-typ="{{ typklass(v) }}" data-pris="{{ v.pris or 0 }}" data-kop="{{ 1 if v.kopforslag else 0 }}" data-provat="{{ 1 if v.betyg_kalla == 'finewines' else 0 }}" data-betyg="{{ v.betyg }}" data-prisvarde="{{ v.prisvarde }}" data-rank="{{ v.rank }}" data-datum="{{ v.lansering }}" data-datumtext="{{ svenskt_datum(v.lansering) }}" data-namn="{{ v.namn }}" data-land="{{ v.land }}" data-prisvisning="{{ v.pris|kr }}" data-poang="{{ v.betyg|poang }}" data-druvor="{{ v.druvor|join('|')|lower }}" data-plats="{{ (v.land ~ ' ' ~ v.region)|lower }}" data-prod="{{ (v.producent ~ ' ' ~ v.namn)|lower }}" data-fasta="{{ v.etiketter|reject('equalto', 'Din stil')|join(', ') }}" data-bild="{{ v.bild or '' }}" data-nr="{{ v.nr }}" data-url="{{ v.url }}" data-flaskor="{{ v.flaskor or '' }}" data-tid="{{ v.saljstart_tid or '10:00' }}" data-sortiment="{{ v.sortiment }}">
+  <article class="vin" id="v-{{ v.nr }}" data-typ="{{ typklass(v) }}" data-pris="{{ v.pris or 0 }}" data-kop="{{ 1 if v.kopforslag else 0 }}" data-provat="{{ 1 if v.betyg_kalla == 'finewines' else 0 }}" data-betyg="{{ v.betyg }}" data-prisvarde="{{ v.prisvarde }}" data-rank="{{ v.rank }}" data-datum="{{ v.lansering }}" data-datumtext="{{ svenskt_datum(v.lansering) }}" data-namn="{{ v.namn }}" data-land="{{ v.land }}" data-prisvisning="{{ v.pris|kr }}" data-poang="{{ v.betyg|poang }}" data-druvor="{{ v.druvor|join('|')|lower }}" data-plats="{{ (v.land ~ ' ' ~ v.region)|lower }}" data-prod="{{ (v.producent ~ ' ' ~ v.namn)|lower }}" data-fasta="{{ v.etiketter|reject('equalto', 'Din stil')|join(', ') }}" data-bild="{{ v.bild or '' }}" data-nr="{{ v.nr }}" data-url="{{ v.url }}" data-flaskor="{{ v.flaskor or '' }}" data-tid="{{ v.saljstart_tid or '10:00' }}" data-sortiment="{{ v.sortiment }}" data-mk="{{ v.munskankarna.betyg if v.munskankarna else '' }}" data-mkfynd="{{ 1 if v.munskankarna and v.munskankarna.prisvarde in ('Fynd i sin prisklass', 'Mer än prisvärt') else 0 }}">
     {{ flaska(v, 100) }}
-    <div class="betyg {{ 'provat' if v.betyg_kalla == 'finewines' else 'gissat' }}">
+    {% set mk = v.munskankarna %}
+    <div class="betyg {{ 'provat' if v.betyg_kalla == 'finewines' else 'gissat' }}{% if mk and v.betyg_kalla != 'finewines' %} bara-mk{% endif %}">
+      {% if not (mk and v.betyg_kalla != 'finewines') %}<div style="display:grid;justify-items:center;gap:4px">
       <b>{{ v.betyg|poang }}</b>
       <small>{% if v.betyg_kalla == 'finewines' %}<span class="lang">finewines</span><span class="kort">forum</span>{% if v.recensioner|selectattr("poang")|list|length > 1 %} ({{ v.recensioner|selectattr("poang")|list|length }}){% endif %}{% else %}<span class="lang">uppskattat</span><span class="kort">gissat</span>{% endif %}</small>
+      </div>{% endif %}
+      {% if mk %}<div class="mkbetyg" title="Munskänkarna: {{ mk.betyg|poang }} av 20"><b>{{ mk.betyg|poang }}</b><small>/20 MK</small></div>{% endif %}
     </div>
     <div>
       <div class="namnrad"><span class="prick" style="background: var(--{{ typklass(v) }})" title="{{ v.typ }}"></span><h3>{{ v.namn }}</h3></div>
@@ -335,21 +354,26 @@ body.har-korg .wrap { padding-bottom: 110px; }
         <span class="tagg stil{% if not v.preferenstraffar %} dold{% endif %}" data-roll="stil">Din stil: {{ v.preferenstraffar|join(", ") }}</span>
         {% if v.sortiment == "Webblanseringar" %}<span class="tagg">Webblansering</span>{% endif %}
         {% if v.betyg_kalla == 'finewines' %}<span class="tagg">Prisvärde {{ "%+.1f"|format(v.prisvarde)|replace(".", ",") }}</span>{% endif %}
+        {% if mk and mk.prisvarde %}<span class="tagg {{ {'Fynd i sin prisklass':'mk-fynd','Mer än prisvärt':'mk-bra','Ej prisvärt':'mk-ej'}.get(mk.prisvarde, '') }}">MK: {{ mk.prisvarde }}</span>{% endif %}
       </div>
+      {% if v.oense %}<span class="oense">Forumet och Munskänkarna tycker olika</span>{% endif %}
       <details>
-        <summary>{% if v.recensioner %}Läs {{ v.recensioner|length }} {{ "anteckning" if v.recensioner|length == 1 else "anteckningar" }} från finewines.se{% else %}Mer om vinet{% endif %}{% if v.omnamnanden %} · nämns i {{ v.omnamnanden }} svar{% endif %}</summary>
+        {% set antal_rec = v.recensioner|length + (1 if mk else 0) %}
+        <summary>{% if antal_rec %}Läs {{ antal_rec }} {{ "recension" if antal_rec == 1 else "recensioner" }}{% else %}Mer om vinet{% endif %}{% if v.omnamnanden %} · nämns i {{ v.omnamnanden }} svar{% endif %}</summary>
         <div class="detalj">
         {% if v.bild %}{{ flaska(v, 200, "stor-flaska") }}{% endif %}
         {% for r in v.recensioner %}
-        <div class="recension"><div class="vem">{{ r.forfattare or "Forumet" }}{% if r.poang %} · {{ r.poang|poang }} p{% endif %} · <a href="{{ r.url }}" target="_blank" rel="noopener">inlägget</a></div>{{ r.text }}</div>
+        <div class="recension"><div class="vem"><b>finewines.se</b> · {{ r.forfattare or "Forumet" }}{% if r.poang %} · {{ r.poang|poang }} p{% endif %} · <a href="{{ r.url }}" target="_blank" rel="noopener">inlägget</a></div>{{ r.text }}</div>
         {% endfor %}
+        {% if mk %}<div class="recension mk"><div class="vem"><b>Munskänkarna</b> · {{ mk.betyg|poang }} av 20{% if mk.prisvarde %} · {{ mk.prisvarde }}{% endif %}{% if mk.typisk %} · druv- eller distrikttypiskt{% endif %} · <a href="{{ mk.url }}" target="_blank" rel="noopener">läs hos Munskänkarna</a></div>{{ mk.text }}</div>{% endif %}
         {% if v.smak %}<p class="sb-smak"><span class="etikett">Systembolaget</span><br>{{ v.smak }}{% if v.passar_till %} Passar till {{ v.passar_till|join(", ")|lower }}.{% endif %}</p>{% endif %}
-        {% if not v.recensioner and not v.smak %}<p class="sb-smak">Ingen provning publicerad ännu.</p>{% endif %}
+        {% if not v.recensioner and not mk and not v.smak %}<p class="sb-smak">Ingen provning publicerad ännu.</p>{% endif %}
         </div>
       </details>
       <div class="lankar">
         <a href="{{ v.url }}" target="_blank" rel="noopener">Systembolaget</a>
         <a href="https://www.vivino.com/search/wines?q={{ v.namn|quote }}" target="_blank" rel="noopener">Sök på Vivino</a>
+        {% if mk %}<a class="mk" href="{{ mk.url }}" target="_blank" rel="noopener">Munskänkarna</a>{% endif %}
         {% if v.trad %}<a href="{{ v.trad.url }}" target="_blank" rel="noopener">Forumtråden</a>{% endif %}
       </div>
       <div class="antal dold">Antal
@@ -369,6 +393,7 @@ body.har-korg .wrap { padding-bottom: 110px; }
 <footer>
   <span>Uppdaterad {{ uppdaterad }}. Källor: systembolaget.se och forumet <a href="https://www.finewines.se/forums/lanseringar-fran-systembolaget.51/" target="_blank" rel="noopener">Lanseringar från Systembolaget</a> på finewines.se.</span>
   <span>Uppskattade betyg bygger på pris, område, ålder och hur mycket vinet diskuteras. De är en gissning och blir aldrig köpförslag på egen hand. Prisvärde visar hur många poäng över eller under det vanliga för prisklassen vinet ligger.</span>
+  <span><b style="color:var(--mk)">Munskänkarna</b> (blå ruta) betygsätter på 20-poängsskala: 18–20 exceptionellt, 15–17,5 högklassigt, 12–14,5 bra till mycket bra. Prisvärdhet: Fynd i sin prisklass, Mer än prisvärt, Prisvärt, Ej prisvärt. Deras fynd räknas som Fynd här, och viner med minst ditt lägsta Munskänkarna-betyg blir köpförslag. Källa: <a href="https://www.munskankarna.se/sv/vinlocus/" target="_blank" rel="noopener">Munskänkarnas Vinlocus</a>.</span>
 </footer>
 </div>
 
@@ -414,7 +439,7 @@ body.har-korg .wrap { padding-bottom: 110px; }
 </section>
 <script>
 (function () {
-  var st = { kop: false, provat: false, typer: new Set(), max: 0, datum: "", sort: "rank", korg: false };
+  var st = { kop: false, provat: false, typer: new Set(), max: 0, datum: "", sort: "rank", korg: false, mk: false };
   var korg = {}, kalSparad = {};
   var datumFinns = {}; document.querySelectorAll("#f-datum option").forEach(function (o) { datumFinns[o.value] = 1; });
   var KEY = "vinslapp-filter";
@@ -442,9 +467,11 @@ body.har-korg .wrap { padding-bottom: 110px; }
     var perDatum = {};
     document.querySelectorAll("article.vin").forEach(function (a) {
       var d = a.dataset, t = traffar(a), provat = d.provat === "1", betyg = +d.betyg, pv = +d.prisvarde;
-      var kop = provat && !(maxpris && +d.pris > maxpris) &&
-        (betyg >= min || (betyg >= min - 1 && (pv >= 3 || t.length > 0)));
-      d.rank = (betyg + 0.3 * pv + (t.length ? 1 : 0) - (provat ? 0 : 3)).toFixed(2);
+      var mk = d.mk ? +d.mk : 0, mkFynd = d.mkfynd === "1", mkMin = +pref.munskankarna_min || 16.5;
+      var kopForum = provat && (betyg >= min || (betyg >= min - 1 && (pv >= 3 || t.length > 0)));
+      var kop = (kopForum || (mk && mk >= mkMin)) && !(maxpris && +d.pris > maxpris);
+      var grund = provat ? betyg + 0.3 * pv : (mk ? 85 + (mk - 14) * 2.5 : betyg + 0.3 * pv - 3);
+      d.rank = (grund + (t.length ? 1 : 0) + (mkFynd ? 0.5 : 0)).toFixed(2);
       var stil = a.querySelector('[data-roll="stil"]');
       stil.textContent = "Din stil: " + t.join(", "); stil.classList.toggle("dold", !t.length);
       d.stil = t.length ? "Din stil" : "";
@@ -485,6 +512,7 @@ body.har-korg .wrap { padding-bottom: 110px; }
     $("p-maxpris").value = pref.maxpris || "";
     $("p-minbetyg").value = pref.minbetyg_kopforslag || 89;
     $("p-perslapp").value = pref.max_kopforslag_per_slapp || 6;
+    $("p-mkmin").value = pref.munskankarna_min || 16.5;
     var valdaDruvor = lista(pref.favoritdruvor).map(function (x) { return x.toLowerCase(); });
     document.querySelectorAll("#p-druvforslag button").forEach(function (b) { b.setAttribute("aria-pressed", valdaDruvor.indexOf(b.dataset.druva.toLowerCase()) >= 0); });
   }
@@ -494,7 +522,8 @@ body.har-korg .wrap { padding-bottom: 110px; }
       favoritdruvor: delad($("p-druvor").value), favoritomraden: delad($("p-omraden").value),
       favoritproducenter: delad($("p-producenter").value), maxpris: +$("p-maxpris").value || 0,
       minbetyg_kopforslag: Math.min(100, Math.max(70, +$("p-minbetyg").value || 89)),
-      max_kopforslag_per_slapp: Math.max(1, +$("p-perslapp").value || 6)
+      max_kopforslag_per_slapp: Math.max(1, +$("p-perslapp").value || 6),
+      munskankarna_min: Math.min(20, Math.max(10, +String($("p-mkmin").value).replace(",", ".") || 16.5))
     };
   }
   var statusTimer;
@@ -504,7 +533,7 @@ body.har-korg .wrap { padding-bottom: 110px; }
     $("p-status").textContent = meddelande || ("Sparat. " + n + " köpförslag.");
     clearTimeout(statusTimer); statusTimer = setTimeout(function () { $("p-status").textContent = ""; }, 4000);
   }
-  ["p-druvor", "p-omraden", "p-producenter", "p-maxpris", "p-minbetyg", "p-perslapp"].forEach(function (id) {
+  ["p-druvor", "p-omraden", "p-producenter", "p-maxpris", "p-minbetyg", "p-perslapp", "p-mkmin"].forEach(function (id) {
     $(id).addEventListener("change", function () { lasPanel(); fyllPanel(); tillampa(); });
   });
   document.querySelectorAll("#p-druvforslag button").forEach(function (b) {
@@ -539,6 +568,7 @@ body.har-korg .wrap { padding-bottom: 110px; }
     document.getElementById("f-datum").value = st.datum;
     document.getElementById("f-sort").value = st.sort;
     document.getElementById("f-korg").setAttribute("aria-pressed", st.korg);
+    document.getElementById("f-mk").setAttribute("aria-pressed", st.mk);
     var kopSynliga = 0;
     document.querySelectorAll(".kop li").forEach(function (li) {
       var ok = !st.datum || li.dataset.datum === st.datum; li.classList.toggle("dold", !ok); if (ok) kopSynliga++;
@@ -553,6 +583,7 @@ body.har-korg .wrap { padding-bottom: 110px; }
         if (st.sort === "prisvarde") return (e.prisvarde - d.prisvarde) || (e.rank - d.rank);
         if (st.sort === "pris-upp") return (d.pris - e.pris) || (e.rank - d.rank);
         if (st.sort === "pris-ned") return (e.pris - d.pris) || (e.rank - d.rank);
+        if (st.sort === "mk") return ((+e.mk || 0) - (+d.mk || 0)) || (e.rank - d.rank);
         return e.rank - d.rank;
       });
       var ankare = sec.querySelector(".tomt");
@@ -561,7 +592,7 @@ body.har-korg .wrap { padding-bottom: 110px; }
       sec.querySelectorAll("article.vin").forEach(function (a) {
         var ok = (!st.kop || a.dataset.kop === "1") && (!st.provat || a.dataset.provat === "1")
           && (!st.typer.size || st.typer.has(a.dataset.typ)) && (!st.max || +a.dataset.pris <= st.max)
-          && (!st.korg || !!korg[a.dataset.nr]);
+          && (!st.korg || !!korg[a.dataset.nr]) && (!st.mk || !!a.dataset.mk);
         a.classList.toggle("dold", !ok); if (ok) synliga++;
       });
       var t = sec.querySelector(".tomt"); if (t) t.classList.toggle("dold", synliga > 0);
@@ -845,6 +876,7 @@ body.har-korg .wrap { padding-bottom: 110px; }
   $("korgbar-visa").onclick = function () { var d = $("korgbar").dataset.datum; d ? visaKorg(d) : visaOversikt(); };
   $("korg-oversikt-knapp").onclick = visaOversikt;
   $("f-korg").onclick = function () { st.korg = !st.korg; rita(); };
+  $("f-mk").onclick = function () { st.mk = !st.mk; rita(); };
   function status(t) { $("korg-status").textContent = t; }
   $("korg-kalender").onclick = function () {
     var d = aktuelltDatum, ics = skapaIcs(d);
