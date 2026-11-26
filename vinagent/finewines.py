@@ -169,27 +169,59 @@ def sammanstall(trad: dict, inlagg: list[dict]) -> dict[str, dict]:
 
 # ---------- hämtning ----------
 
-def hamta_anteckningar(ctx, fran: date) -> dict[str, dict]:
-    """Anteckningar för alla släpptrådar med datum från och med `fran`."""
+FORSOK = 3
+
+
+def _las(page, url: str) -> str | None:
+    """Öppnar en sida, försöker igen vid störningar. None om det inte gick."""
+    for forsok in range(1, FORSOK + 1):
+        try:
+            page.goto(url, wait_until="domcontentloaded", timeout=45_000)
+            return page.content()
+        except Exception as e:  # noqa: BLE001 - tillfälliga fel hos forumet
+            log.warning("Finewines: försök %s/%s misslyckades för %s (%s)", forsok, FORSOK, url,
+                        str(e).splitlines()[0])
+            pause()
+            pause()
+    return None
+
+
+def hamta_anteckningar(ctx, fran: date) -> tuple[dict[str, dict], dict]:
+    """Anteckningar för alla släpptrådar med datum från och med `fran`.
+
+    Returnerar (anteckningar, status). status["lista_ok"] är falskt om ingen
+    forumsida gick att läsa, och status["misslyckade"] är trådar som inte kunde
+    läsas helt, så att gårdagens anteckningar kan användas för dem.
+    """
     page = ctx.new_page()
     resultat: dict[str, dict] = {}
+    status = {"lista_ok": False, "misslyckade": set()}
     try:
         trader: list[dict] = []
         for s in range(1, FORUMSIDOR + 1):
-            url = FORUM if s == 1 else f"{FORUM}page-{s}"
-            page.goto(url, wait_until="domcontentloaded", timeout=60_000)
-            trader += trader_fran_html(page.content())
+            html = _las(page, FORUM if s == 1 else f"{FORUM}page-{s}")
             pause()
+            if html is None:
+                continue
+            status["lista_ok"] = True
+            for t in trader_fran_html(html):
+                if t["url"] not in {x["url"] for x in trader}:
+                    trader.append(t)
         trader = [t for t in trader if t["datum"] >= fran]
         log.info("Finewines: %s släpptrådar från %s", len(trader), fran)
         for t in trader:
-            page.goto(t["url"], wait_until="domcontentloaded", timeout=60_000)
-            html = page.content()
+            html = _las(page, t["url"])
+            if html is None:
+                status["misslyckade"].add(t["url"])
+                continue
             inlagg = inlagg_fran_html(html)
             for s in range(2, sista_sida(html) + 1):
                 pause()
-                page.goto(f"{t['url']}page-{s}", wait_until="domcontentloaded", timeout=60_000)
-                inlagg += inlagg_fran_html(page.content())
+                mer = _las(page, f"{t['url']}page-{s}")
+                if mer is None:
+                    status["misslyckade"].add(t["url"])
+                    continue
+                inlagg += inlagg_fran_html(mer)
             pause()
             for nr, data in sammanstall(t, inlagg).items():
                 if nr in resultat:  # samma vin i flera trådar: slå ihop
@@ -199,4 +231,4 @@ def hamta_anteckningar(ctx, fran: date) -> dict[str, dict]:
                     resultat[nr] = data
     finally:
         page.close()
-    return resultat
+    return resultat, status

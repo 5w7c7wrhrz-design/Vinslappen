@@ -243,3 +243,79 @@ def test_oense_och_sidan_visar_munskankarna():
     assert "16,5" in html and "/20 MK" in html and "MK: Ej prisvärt" in html
     assert "Forumet och Munskänkarna tycker olika" in html
     assert "Finstämd doft av hallon" in html and 'id="f-mk"' in html
+
+
+# ---------------- Störningar hos forumet ----------------
+from vinagent import main as vmain
+
+FORUMLISTA = """<html><body>
+<a data-tp-primary="on" href="/threads/tillfaelligt-sortiment-20261127.1/">Tillfälligt sortiment 20261127</a>
+<a data-tp-primary="on" href="/threads/tillfaelligt-sortiment-20261204.2/">Tillfälligt sortiment 20261204</a>
+</body></html>"""
+
+
+class FalskSida:
+    """Låtsas vara en webbläsarflik. `fel` = adresser som aldrig svarar."""
+
+    def __init__(self, sidor, fel=(), fel_forsta_gangen=()):
+        self.sidor, self.fel, self.fel_en = sidor, set(fel), set(fel_forsta_gangen)
+        self.aktuell, self.besok = None, []
+
+    def goto(self, url, **kw):
+        self.besok.append(url)
+        if url in self.fel or url in self.fel_en:
+            self.fel_en.discard(url)
+            raise TimeoutError("Page.goto: Timeout 45000ms exceeded.")
+        self.aktuell = url
+
+    def content(self):
+        return self.sidor.get(self.aktuell, "<html></html>")
+
+    def close(self):
+        pass
+
+
+class FalskFlik:
+    def __init__(self, sida):
+        self.sida = sida
+
+    def new_page(self):
+        return self.sida
+
+
+T1 = finewines.BAS + "/threads/tillfaelligt-sortiment-20261127.1/"
+T2 = finewines.BAS + "/threads/tillfaelligt-sortiment-20261204.2/"
+
+
+def _forum(fel=(), fel_forsta_gangen=()):
+    f, t1, t2 = finewines.FORUM, T1, T2
+    sidor = {f: FORUMLISTA, t1: TRADSIDA, t2: TRADSIDA.replace("90180", "95631").replace("93081", "94901")}
+    return FalskSida(sidor, fel, fel_forsta_gangen), t1, t2
+
+
+def test_forumet_forsoker_igen_och_hoppar_over_trasiga_sidor(monkeypatch):
+    monkeypatch.setattr(finewines, "pause", lambda: None)
+    sida, t1, t2 = _forum(fel=[finewines.FORUM + "page-2", T2], fel_forsta_gangen=[T1])
+    ant, status = finewines.hamta_anteckningar(FalskFlik(sida), date(2026, 11, 1))
+    assert status["lista_ok"] and status["misslyckade"] == {t2}
+    assert "90180" in ant                       # tråd 1 lästes på andra försöket
+    assert "95631" not in ant                   # tråd 2 svarade aldrig
+    assert sida.besok.count(t2) == finewines.FORSOK
+
+
+def test_gardagens_anteckningar_fyller_luckor():
+    forra = vmain.anteckningar_fran_forra([
+        {"nr": "95631", "namn": "Fourrier", "pris": 919, "recensioner": [{"poang": 89}], "omnamnanden": 0,
+         "trad": {"url": "T2", "datum": "2026-12-04", "typ": "Tillfälligt sortiment", "titel": "x"}},
+        {"nr": "11111", "recensioner": [{"poang": 85}], "omnamnanden": 0,
+         "trad": {"url": "T1", "datum": "2026-11-27", "typ": "Tillfälligt sortiment", "titel": "y"}},
+        {"nr": "22222", "recensioner": [], "omnamnanden": 0, "trad": None},
+    ])
+    assert set(forra) == {"95631", "11111"} and forra["95631"]["rubrik"]["pris"] == 919
+    nya = {"90180": {"recensioner": [], "omnamnanden": 1, "trad": {"url": "T1"}}}
+    # bara tråd T2 strulade: bara dess viner fylls på
+    assert vmain.fyll_pa_fran_forra(nya, {"lista_ok": True, "misslyckade": {"T2"}}, forra) == 1
+    assert "95631" in nya and "11111" not in nya
+    # hela forumet nere: allt från förra körningen används
+    tomt = {}
+    assert vmain.fyll_pa_fran_forra(tomt, {"lista_ok": False, "misslyckade": set()}, forra) == 2

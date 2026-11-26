@@ -40,6 +40,8 @@ jobs:
         run: python -m pytest tests/test_vinagent.py -q
 
       - name: Hämta släpp och bygg sidan
+        env:
+          SIDANS_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
         run: python -m vinagent --dagar "${{ inputs.dagar || '60' }}" --ut site
 
       - name: Spara felsökning om något gick fel

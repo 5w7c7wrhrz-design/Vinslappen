@@ -106,6 +106,7 @@ python -m pytest tests/test_vinagent.py
 
 - Systembolaget publicerar ett släpp några veckor i förväg, så längre fram är listan tom.
 - Om Systembolaget eller forumet byter utseende på sina sidor kan agenten behöva justeras.
-  Forumet nere stoppar inte körningen: listan byggs då utan anteckningar.
+  Svarar forumet inte försöker agenten igen (tre gånger per sida), hoppar över det som inte
+  går att läsa och använder förra körningens anteckningar för de trådarna.
 - Agenten pausar en sekund mellan sidorna för att inte belasta sajterna.
 - Betygen speglar forumprovarnas smak. Läs anteckningarna innan du köper.

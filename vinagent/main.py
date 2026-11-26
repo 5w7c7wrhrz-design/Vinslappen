@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import logging
 from datetime import date, datetime, timedelta
 from pathlib import Path
@@ -26,6 +27,50 @@ def las_preferenser(sokvag: Path) -> dict:
 
 def sok_url_sb(nr: str) -> str:
     return f"https://www.systembolaget.se/sok/?textQuery={nr}"
+
+
+def anteckningar_fran_forra(viner: list[dict]) -> dict[str, dict]:
+    """Forumanteckningar ur förra körningens viner.json, i samma form som finewines ger."""
+    ut = {}
+    for v in viner or []:
+        if not (v.get("recensioner") or v.get("omnamnanden")) or not v.get("trad"):
+            continue
+        ut[v["nr"]] = {
+            "recensioner": v.get("recensioner") or [], "omnamnanden": v.get("omnamnanden") or 0,
+            "trad": v["trad"],
+            "rubrik": {k: v.get(k) for k in ("namn", "pris", "flaskor", "volym_ml", "argang") if v.get(k)},
+        }
+    return ut
+
+
+def fyll_pa_fran_forra(nya: dict[str, dict], status: dict, forra: dict[str, dict]) -> int:
+    """Använder förra körningens anteckningar där forumet inte gick att läsa i dag."""
+    if not forra:
+        return 0
+    lagt_till = 0
+    for nr, data in forra.items():
+        if nr in nya:
+            continue
+        if not status.get("lista_ok") or data["trad"].get("url") in status.get("misslyckade", ()):
+            nya[nr] = data
+            lagt_till += 1
+    return lagt_till
+
+
+def hamta_forra(ctx) -> list[dict]:
+    """Förra körningens viner.json från den publicerade sidan (om den finns)."""
+    url = os.environ.get("SIDANS_URL")
+    if not url:
+        return []
+    page = ctx.new_page()
+    try:
+        svar = page.goto(url.rstrip("/") + "/viner.json", wait_until="domcontentloaded", timeout=45_000)
+        return json.loads(svar.text()) if svar and svar.ok else []
+    except Exception as e:  # noqa: BLE001
+        log.warning("Kunde inte läsa förra körningens data: %s", str(e).splitlines()[0])
+        return []
+    finally:
+        page.close()
 
 
 def koppla_munskankarna(viner: list[dict], mk: dict[str, dict]) -> None:
@@ -79,10 +124,14 @@ def kor(dagar_fram: int, dagar_bak: int, ut: Path, pref_fil: Path) -> list[dict]
         sb = systembolaget.hamta_slapp(ctx, fran, till)
         log.info("Systembolaget: %s viner %s–%s", len(sb), fran, till)
         try:
-            anteckningar = finewines.hamta_anteckningar(ctx, fran - timedelta(days=14))
+            anteckningar, status = finewines.hamta_anteckningar(ctx, fran - timedelta(days=14))
         except Exception:  # forumet nere ska inte stoppa listan
-            log.exception("Kunde inte läsa finewines.se, fortsätter utan anteckningar")
-            anteckningar = {}
+            log.exception("Kunde inte läsa finewines.se")
+            anteckningar, status = {}, {"lista_ok": False, "misslyckade": set()}
+        if not status["lista_ok"] or status["misslyckade"]:
+            n = fyll_pa_fran_forra(anteckningar, status, anteckningar_fran_forra(hamta_forra(ctx)))
+            log.warning("Finewines gick inte att läsa helt; använder förra körningens anteckningar "
+                        "för %s viner", n)
         log.info("Finewines: anteckningar om %s artikelnummer", len(anteckningar))
         try:
             mk = munskankarna.hamta(ctx, fran, till)
